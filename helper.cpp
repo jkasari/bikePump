@@ -95,9 +95,9 @@ bool MainController::isStable(float pressure) {
 
 void MainController::smartMode(float pressure) {
     if (isStable(pressure)) {
-        if (Manual) {
+        if (!Manual) {
+            touchTarget();
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            Serial.println(diff);
             if (diff > .5) {
                 adjustGates(Target, pressure);
             } 
@@ -109,6 +109,7 @@ void MainController::smartMode(float pressure) {
 }
 
 void MainController::manualMode(float pressure) {
+    Manual = true;
     Target = pressure;
     if (Button_1.isPressed()) {
         calcAndOpenGate(true, .1);
@@ -125,9 +126,9 @@ void MainController::checkGates() {
 void MainController::adjustGates(float target, float current) {
     float diff = target - current;
     if (diff > 0) {
-        calcAndOpenGate(true, diff);
+        calcAndOpenGate(false, diff);
     } else {
-        calcAndOpenGate(false, diff * -1);
+        calcAndOpenGate(true, diff * -1);
     }
 }
 
@@ -138,4 +139,22 @@ void MainController::calcAndOpenGate(bool gateNum, float diff) {
     } else {
         Gate_2.turnGateOn(waitTime);
     }
+}
+
+void MainController::touchTarget() {
+    if (Button_1.hasBeenPressed()) {
+        Target--;
+    } else if (Button_2.hasBeenPressed()) {
+        Target++;
+    }
+    if (Target > 50) {
+        Target = 50;
+    }
+    if (0 > Target) {
+        Target = 0;
+    }
+}
+
+float MainController::getTarget() {
+    return Target;
 }

@@ -95,6 +95,8 @@ class MainController {
 
         void manualMode(float); 
 
+        float getTarget();
+
     private:
         Button Button_1;
         Button Button_2;
@@ -115,5 +117,7 @@ class MainController {
         void adjustGates(float, float);
 
         void calcAndOpenGate(bool, float);
+
+        void touchTarget();
 
 };
