@@ -12,6 +12,7 @@ DisplayControl::DisplayControl() :
     pinMode(LCD_D5, OUTPUT);
     pinMode(LCD_D6, OUTPUT);
     pinMode(LCD_D7, OUTPUT);
+    LCD.begin(16, 2);
     initNumbers(); 
 }
 
