@@ -1,5 +1,40 @@
 #include "helper.h"
 
+AirGate::AirGate(uint8_t Pin) {
+    pinMode(Pin, OUTPUT);
+    this->Pin = Pin;
+}
+
+bool AirGate::checkGate() {
+    if (!closed) {
+        if (millis() - timeOpenned > openDuration) {
+            flipGate(false);
+        }
+    }
+    return closed;
+}
+
+void AirGate::turnGateOn() {
+    flipGate(true);
+}
+
+void AirGate::turnGateOff() {
+    flipGate(false);
+}
+
+void AirGate::turnGateOn(uint8_t seconds) {
+    openDuration = seconds * 1000;
+    flipGate(true);
+}
+
+void AirGate::flipGate(bool highOrLow) {
+    closed = !highOrLow;
+    if (highOrLow) {
+        timeOpenned = millis();
+    }
+    digitalWrite(Pin, int(highOrLow));
+}
+
 Button::Button(uint8_t Port) { 
     this->Port = Port; 
     pinMode(Port, INPUT_PULLUP);
@@ -27,4 +62,21 @@ MainController::MainController() :
     Button_3(BUTTON3),
     Button_4(BUTTON4),
     Button_5(BUTTON5),
-    Button_6(BUTTON6) {}
+    Button_6(BUTTON6),
+    Gate_1(GATE_1),
+    Gate_2(GATE_2) {}
+
+void MainController::testingFunction() {
+    checkGates();
+    if (Button_1.hasBeenPressed() > 0) {
+        Gate_1.turnGateOn(1);
+    }
+    if (Button_2.hasBeenPressed() > 0) {
+        Gate_2.turnGateOn(1);
+    }
+
+}
+
+bool MainController::checkGates() {
+    return Gate_1.checkGate() && Gate_2.checkGate(); 
+}

@@ -8,7 +8,44 @@
 #define BUTTON5 A1
 #define BUTTON6 12
 #define GATE_NUM 2
+#define GATE_1 6
+#define GATE_2 7
 
+
+/**
+ * @brief A class that controls the basic functions of a gate.
+ * This keeps track of info about the gate such as:
+ * How long it's been open or closed for.
+ * Automatic turn off given a set time.
+ */
+
+class AirGate {
+
+    public:
+        AirGate(uint8_t);
+
+        // MUST CALL in a loop for the auto turn off to happen
+        // Returns true if the gate is closed, false if not
+        bool checkGate();
+
+        // A function that turns the gate on with no time limit
+        void turnGateOn();
+        
+        // Turns a gate off.
+        void turnGateOff();
+
+        // Takes in the number of seconds you want the gate to be turned on for. 
+        void turnGateOn(uint8_t);
+
+    private:
+        uint8_t Pin;
+        bool closed = true;
+        uint32_t openDuration = 0;
+        uint32_t timeOpenned = 0;
+
+        void flipGate(bool);
+
+};
 
 /**
  * The button class takes in a port number to read.
@@ -43,6 +80,8 @@ class MainController {
     public:
 
         MainController();
+        
+        void testingFunction();
 
 
     private:
@@ -52,4 +91,8 @@ class MainController {
         Button Button_4;    
         Button Button_5;    
         Button Button_6;    
+        AirGate Gate_1;
+        AirGate Gate_2;
+
+        bool checkGates();
 };

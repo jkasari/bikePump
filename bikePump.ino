@@ -10,13 +10,13 @@
 #define LCD_D6 8
 #define LCD_D7 9
 #define PSI_CONSTANT 0.015625
-#define GATE_ONE 6
-#define GATE_TWO 7
+
+MainController Controller;
 
 void setup() {
-
+    Serial.begin(115200);
 }
 
 void loop() {
-
+    Controller.testingFunction();
 }
