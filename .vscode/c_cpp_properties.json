@@ -17,7 +17,7 @@
             "intelliSenseMode": "gcc-x64",
             "includePath": [
                 "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino",
-                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/variants/standard",
+                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/variants/eightanaloginputs",
                 "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/Wire/src",
                 "/home/jkasari/Arduino/libraries/Adafruit_ADS1X15",
                 "/home/jkasari/Arduino/libraries/Adafruit_BusIO",
@@ -35,7 +35,7 @@
             "defines": [
                 "F_CPU=16000000L",
                 "ARDUINO=10820",
-                "ARDUINO_AVR_UNO",
+                "ARDUINO_AVR_NANO",
                 "ARDUINO_ARCH_AVR",
                 "__DBL_MIN_EXP__=(-125)",
                 "__HQ_FBIT__=15",

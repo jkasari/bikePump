@@ -1,0 +1,55 @@
+#include <Arduino.h>
+
+#define BUTTON_NUM 6
+#define BUTTON1 A3
+#define BUTTON2 10
+#define BUTTON3 11
+#define BUTTON4 A2
+#define BUTTON5 A1
+#define BUTTON6 12
+#define GATE_NUM 2
+
+
+/**
+ * The button class takes in a port number to read.
+ * Call the check function in your loop to check if the button was pressed.
+ * use the result to decide what to do based on how long the button was held down for.
+ */
+
+class Button {
+
+  public:
+  // Takes a port number to read
+  Button(uint8_t);
+
+  // Returns a count of how long the button was pressed for only after it's been pressed and released. 
+  uint32_t hasBeenPressed();
+
+  // Returns true when the button is pressed and false when released.
+  bool isPressed();
+
+  private:
+  uint32_t Count;
+  uint8_t Port;
+};
+
+/**
+ * Talks to the buttons, gates and pressure reader. 
+ * Has functions that return usable data from these objects.
+ */
+
+class MainController {
+
+    public:
+
+        MainController();
+
+
+    private:
+        Button Button_1;
+        Button Button_2;
+        Button Button_3;    
+        Button Button_4;    
+        Button Button_5;    
+        Button Button_6;    
+};
