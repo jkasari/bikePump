@@ -1,5 +1,40 @@
 #include "helper.h"
 
+AirGate::AirGate(uint8_t Pin) {
+    pinMode(Pin, OUTPUT);
+    this->Pin = Pin;
+}
+
+AirGate::checkGate() {
+    if (!closed) {
+        if (millis() - timeOpenned > openDuration) {
+            flipGate(false);
+        }
+    }
+    return closed;
+}
+
+void AirGate::turnGateOn() {
+    flipGate(true);
+}
+
+void AirGate::turnGateOff() {
+    flipGate(false);
+}
+
+void AirGate::turnGateOn(uint8_t seconds) {
+    openDuration = seconds * 1000;
+    flipGate(true);
+}
+
+void AirGate::flipGate(bool highOrLow) {
+    closed = !highOrLow;
+    if (highOrLow) {
+        timeOpenned = millis();
+    }
+    digitalWrite(Pin, int(highOrLow));
+}
+
 Button::Button(uint8_t Port) { 
     this->Port = Port; 
     pinMode(Port, INPUT_PULLUP);

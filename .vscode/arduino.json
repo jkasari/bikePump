@@ -1,7 +1,4 @@
 {
     "port": "/dev/ttyUSB0",
-    "configuration": "cpu=atmega328",
-    "board": "arduino:avr:nano",
-    "programmer": "arduino:avrispmkii",
-    "sketch": "bikePump.ino"
+    "board": "arduino:avr:nano"
 }
