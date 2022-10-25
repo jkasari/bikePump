@@ -11,7 +11,8 @@
 #define GATE_1 6
 #define GATE_2 7
 #define STABLE_TOLERANCE .2
-#define SETTLE_TIME 10
+#define SETTLE_TIME 1000
+#define TOLERANCE 1
 
 
 /**

@@ -80,6 +80,7 @@ bool MainController::gatesClosed() {
 
 bool MainController::isStable(float pressure) {
     if (millis() - StableCheckTime > SETTLE_TIME) {
+        Serial.print("NotStable and : ");
         StableCheckTime = millis();
         float diff = pressure > OldPressure ? pressure - OldPressure : OldPressure - pressure;
         OldPressure = pressure;
@@ -98,7 +99,7 @@ void MainController::smartMode(float pressure) {
         if (!Manual) {
             touchTarget();
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            if (diff > .5) {
+            if (diff > TOLERANCE) {
                 adjustGates(Target, pressure);
             } 
         } else {
@@ -110,11 +111,14 @@ void MainController::smartMode(float pressure) {
 
 void MainController::manualMode(float pressure) {
     Manual = true;
-    Target = pressure;
+    if (isStable(pressure)) {
+        Target = pressure;
+    }
+    touchTarget();
     if (Button_1.isPressed()) {
-        calcAndOpenGate(true, .1);
+        calcAndOpenGate(true, 1);
     } else if (Button_2.isPressed()) {
-        calcAndOpenGate(false, .1);
+        calcAndOpenGate(false, 1);
     }
 }
 
@@ -134,10 +138,12 @@ void MainController::adjustGates(float target, float current) {
 
 void MainController::calcAndOpenGate(bool gateNum, float diff) {
     uint32_t waitTime = diff * ((-2/(diff+1)*1000)+2000);
+    // Must be in milli seconds
+    Serial.println("And still openning a gate");
     if (gateNum) {
-        Gate_1.turnGateOn(waitTime);
+        Gate_1.turnGateOn(20);
     } else {
-        Gate_2.turnGateOn(waitTime);
+        Gate_2.turnGateOn(20);
     }
 }
 
