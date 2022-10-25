@@ -5,7 +5,7 @@ AirGate::AirGate(uint8_t Pin) {
     this->Pin = Pin;
 }
 
-AirGate::checkGate() {
+bool AirGate::checkGate() {
     if (!closed) {
         if (millis() - timeOpenned > openDuration) {
             flipGate(false);
@@ -62,4 +62,21 @@ MainController::MainController() :
     Button_3(BUTTON3),
     Button_4(BUTTON4),
     Button_5(BUTTON5),
-    Button_6(BUTTON6) {}
+    Button_6(BUTTON6),
+    Gate_1(GATE_1),
+    Gate_2(GATE_2) {}
+
+void MainController::testingFunction() {
+    checkGates();
+    if (Button_1.hasBeenPressed() > 0) {
+        Gate_1.turnGateOn(1);
+    }
+    if (Button_2.hasBeenPressed() > 0) {
+        Gate_2.turnGateOn(1);
+    }
+
+}
+
+bool MainController::checkGates() {
+    return Gate_1.checkGate() && Gate_2.checkGate(); 
+}

@@ -8,6 +8,8 @@
 #define BUTTON5 A1
 #define BUTTON6 12
 #define GATE_NUM 2
+#define GATE_1 6
+#define GATE_2 7
 
 
 /**
@@ -40,6 +42,8 @@ class AirGate {
         bool closed = true;
         uint32_t openDuration = 0;
         uint32_t timeOpenned = 0;
+
+        void flipGate(bool);
 
 };
 
@@ -76,6 +80,8 @@ class MainController {
     public:
 
         MainController();
+        
+        void testingFunction();
 
 
     private:
@@ -85,4 +91,8 @@ class MainController {
         Button Button_4;    
         Button Button_5;    
         Button Button_6;    
+        AirGate Gate_1;
+        AirGate Gate_2;
+
+        bool checkGates();
 };
