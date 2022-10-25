@@ -35,6 +35,10 @@ void AirGate::flipGate(bool highOrLow) {
     digitalWrite(Pin, int(highOrLow));
 }
 
+bool AirGate::isClosed() {
+    return closed;
+}
+
 Button::Button(uint8_t Port) { 
     this->Port = Port; 
     pinMode(Port, INPUT_PULLUP);
@@ -66,17 +70,28 @@ MainController::MainController() :
     Gate_1(GATE_1),
     Gate_2(GATE_2) {}
 
-void MainController::testingFunction() {
-    checkGates();
-    if (Button_1.hasBeenPressed() > 0) {
-        Gate_1.turnGateOn(1);
+void MainController::testingFunction(float pressure) {
+    if (!isStable(pressure)) {
+        Serial.println("Not Stable!!!");
     }
-    if (Button_2.hasBeenPressed() > 0) {
-        Gate_2.turnGateOn(1);
-    }
-
 }
 
-bool MainController::checkGates() {
-    return Gate_1.checkGate() && Gate_2.checkGate(); 
+bool MainController::gatesClosed() {
+    return Gate_1.isClosed() && Gate_2.isClosed();
+}
+
+bool MainController::isStable(float pressure) {
+    if (millis() - StableCheckTime > SETTLE_TIME) {
+        StableCheckTime = millis();
+        float diff = pressure > OldPressure ? pressure - OldPressure : OldPressure - pressure;
+        OldPressure = pressure;
+        if (gatesClosed() && diff < STABLE_TOLERANCE) {
+            Stable = false;
+        }
+    }
+}
+
+void MainController::checkGates() {
+    Gate_1.checkGate();
+    Gate_2.checkGate(); 
 }

@@ -10,6 +10,8 @@
 #define GATE_NUM 2
 #define GATE_1 6
 #define GATE_2 7
+#define STABLE_TOLERANCE .5
+#define SETTLE_TIME 20
 
 
 /**
@@ -37,12 +39,14 @@ class AirGate {
         // Takes in the number of seconds you want the gate to be turned on for. 
         void turnGateOn(uint8_t);
 
+        // Returns true if the gate is closed. 
+        bool isClosed();
+
     private:
         uint8_t Pin;
         bool closed = true;
         uint32_t openDuration = 0;
         uint32_t timeOpenned = 0;
-
         void flipGate(bool);
 
 };
@@ -81,8 +85,11 @@ class MainController {
 
         MainController();
         
-        void testingFunction();
+        void testingFunction(float);
 
+        bool isStable(float);
+
+        void checkGates();
 
     private:
         Button Button_1;
@@ -93,6 +100,9 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
+        float oldPressure = 0;
+        bool stable = true;
 
-        bool checkGates();
+        bool gatesClosed();
+
 };

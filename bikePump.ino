@@ -19,10 +19,9 @@ void setup() {
 
 void loop() {
     float currentPSI = getPressure();
-    Controller.testingFunction();
+    Controller.testingFunction(currentPSI);
     Display.displayNumber(currentPSI);
-    Serial.println(currentPSI);
-    delay(1000);
+    Controller.checkGates();
 }
 
 
