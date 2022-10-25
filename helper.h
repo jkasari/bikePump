@@ -91,6 +91,10 @@ class MainController {
 
         void checkGates();
 
+        void smartMode(float);
+
+        void manualMode(float); 
+
     private:
         Button Button_1;
         Button Button_2;
@@ -103,7 +107,13 @@ class MainController {
         float OldPressure = 0;
         bool Stable = true;
         uint32_t StableCheckTime = 0;
+        bool Manual = true;
+        float Target = 0.0;
 
         bool gatesClosed();
+
+        void adjustGates(float, float);
+
+        void calcAndOpenGate(bool, float);
 
 };

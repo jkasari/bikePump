@@ -22,8 +22,8 @@ void AirGate::turnGateOff() {
     flipGate(false);
 }
 
-void AirGate::turnGateOn(uint8_t seconds) {
-    openDuration = seconds * 1000;
+void AirGate::turnGateOn(uint8_t milliSeconds) {
+    openDuration = milliSeconds;
     flipGate(true);
 }
 
@@ -57,7 +57,7 @@ uint32_t Button::hasBeenPressed() {
 }
 
 bool Button::isPressed() {
-    return digitalRead(Port) == HIGH;
+    return digitalRead(Port) == LOW;
 }
 
 MainController::MainController() : 
@@ -84,7 +84,7 @@ bool MainController::isStable(float pressure) {
         float diff = pressure > OldPressure ? pressure - OldPressure : OldPressure - pressure;
         OldPressure = pressure;
         if (gatesClosed() && diff > STABLE_TOLERANCE) {
-            Serial.println("Not Stable at : "+String(diff));
+            //Serial.println("Not Stable at : "+String(diff));
             Stable = false;
         } else {
             Stable = true;
@@ -93,7 +93,49 @@ bool MainController::isStable(float pressure) {
     return Stable;
 }
 
+void MainController::smartMode(float pressure) {
+    if (isStable(pressure)) {
+        if (Manual) {
+            float diff = pressure > Target ? pressure - Target : Target - pressure;
+            Serial.println(diff);
+            if (diff > .5) {
+                adjustGates(Target, pressure);
+            } 
+        } else {
+            Manual = false;
+            Target = pressure;
+        }
+    }
+}
+
+void MainController::manualMode(float pressure) {
+    Target = pressure;
+    if (Button_1.isPressed()) {
+        calcAndOpenGate(true, .1);
+    } else if (Button_2.isPressed()) {
+        calcAndOpenGate(false, .1);
+    }
+}
+
 void MainController::checkGates() {
     Gate_1.checkGate();
     Gate_2.checkGate(); 
+}
+
+void MainController::adjustGates(float target, float current) {
+    float diff = target - current;
+    if (diff > 0) {
+        calcAndOpenGate(true, diff);
+    } else {
+        calcAndOpenGate(false, diff * -1);
+    }
+}
+
+void MainController::calcAndOpenGate(bool gateNum, float diff) {
+    uint32_t waitTime = diff * ((-2/(diff+1)*1000)+2000);
+    if (gateNum) {
+        Gate_2.turnGateOn(waitTime);
+    } else {
+        Gate_1.turnGateOn(waitTime);
+    }
 }
