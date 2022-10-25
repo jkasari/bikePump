@@ -12,6 +12,7 @@ MainController Controller;
 
 void setup() {
     Serial.begin(115200);
+    Wire.begin();
     ADS.begin();
     ADS.setGain(GAIN_SIXTEEN);
 }
@@ -25,5 +26,5 @@ void loop() {
 
 
 float getReading() {
-    return ADS.readADC_Differential_0_1() * PSI_CONSTANT + .40;
+    return (ADS.readADC_Differential_0_1() * PSI_CONSTANT) + .40;
 }
