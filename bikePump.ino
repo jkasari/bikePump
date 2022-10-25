@@ -18,13 +18,18 @@ void setup() {
 }
 
 void loop() {
-    float currentPSI = getReading();
+    float currentPSI = getPressure();
     Controller.testingFunction();
     Display.displayNumber(currentPSI);
+    Serial.println(currentPSI);
     delay(1000);
 }
 
 
-float getReading() {
-    return (ADS.readADC_Differential_0_1() * PSI_CONSTANT) + .40;
+float getPressure() {
+    float pressure = ADS.readADC_Differential_0_1();
+    if (pressure < 0) {
+        pressure = 0;
+    }
+    return pressure * PSI_CONSTANT;
 }
