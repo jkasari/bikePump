@@ -4,13 +4,12 @@
 #define TOLERANCE 10
 
 
-DisplayControl::DisplayControl(LiquidCrystal* LCDPointer) {
-    this->LCDPointer = LCDPointer;
-    initNumbers();
-}
+DisplayControl::DisplayControl() :
+    LCD(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7)
+    { initNumbers(); }
 
 void DisplayControl::displayNumber(float num) {
-    LCDPointer->clear();
+    LCD.clear();
     uint32_t temp = round(num*10);
     uint8_t index = 0;
     writeCorner(2, 0, 2, 3);
@@ -35,15 +34,15 @@ void DisplayControl::writeDigit(uint8_t index, uint8_t digit) {
 
 void DisplayControl::writeCorner(uint8_t x, uint8_t y, uint8_t numIndex, uint8_t cornerIndex) {
     uint8_t corner = Numbers[numIndex][cornerIndex];
-    LCDPointer->setCursor(x, y);
+    LCD.setCursor(x, y);
     if (corner >= 0 && 8 > corner) {
-        LCDPointer->write(corner);
+        LCD.write(corner);
     }
 }
 
 void DisplayControl::initLCDChars() {
     for (int i = 0; i < 8; ++i) {
-        LCDPointer->createChar(i, NumberCorners[i]);
+        LCD.createChar(i, NumberCorners[i]);
     }
 }
 

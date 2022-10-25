@@ -18,10 +18,10 @@
             "includePath": [
                 "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino",
                 "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/variants/eightanaloginputs",
+                "/home/jkasari/ArduinoApp/arduino-nightly/libraries/LiquidCrystal/src",
                 "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/Wire/src",
                 "/home/jkasari/Arduino/libraries/Adafruit_ADS1X15",
                 "/home/jkasari/Arduino/libraries/Adafruit_BusIO",
-                "/home/jkasari/ArduinoApp/arduino-nightly/libraries/LiquidCrystal/src",
                 "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src",
                 "/home/jkasari/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/lib/gcc/avr/7.3.0/include",
                 "/home/jkasari/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/lib/gcc/avr/7.3.0/include-fixed",
