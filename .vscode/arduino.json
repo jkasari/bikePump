@@ -1,5 +1,6 @@
 {
     "port": "/dev/ttyUSB0",
     "board": "arduino:avr:nano",
-    "sketch": "bikePump.ino"
+    "sketch": "bikePump.ino",
+    "programmer": "arduino:avrispmkii"
 }
