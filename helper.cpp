@@ -134,8 +134,8 @@ void MainController::adjustGates(float target, float current) {
 void MainController::calcAndOpenGate(bool gateNum, float diff) {
     uint32_t waitTime = diff * ((-2/(diff+1)*1000)+2000);
     if (gateNum) {
-        Gate_2.turnGateOn(waitTime);
-    } else {
         Gate_1.turnGateOn(waitTime);
+    } else {
+        Gate_2.turnGateOn(waitTime);
     }
 }
