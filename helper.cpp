@@ -71,9 +71,7 @@ MainController::MainController() :
     Gate_2(GATE_2) {}
 
 void MainController::testingFunction(float pressure) {
-    if (!isStable(pressure)) {
-        Serial.println("Not Stable!!!");
-    }
+    isStable(pressure);
 }
 
 bool MainController::gatesClosed() {
@@ -85,10 +83,14 @@ bool MainController::isStable(float pressure) {
         StableCheckTime = millis();
         float diff = pressure > OldPressure ? pressure - OldPressure : OldPressure - pressure;
         OldPressure = pressure;
-        if (gatesClosed() && diff < STABLE_TOLERANCE) {
+        if (gatesClosed() && diff > STABLE_TOLERANCE) {
+            Serial.println("Not Stable at : "+String(diff));
             Stable = false;
+        } else {
+            Stable = true;
         }
     }
+    return Stable;
 }
 
 void MainController::checkGates() {

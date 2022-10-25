@@ -10,8 +10,8 @@
 #define GATE_NUM 2
 #define GATE_1 6
 #define GATE_2 7
-#define STABLE_TOLERANCE .5
-#define SETTLE_TIME 20
+#define STABLE_TOLERANCE .2
+#define SETTLE_TIME 10
 
 
 /**
@@ -100,8 +100,9 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
-        float oldPressure = 0;
-        bool stable = true;
+        float OldPressure = 0;
+        bool Stable = true;
+        uint32_t StableCheckTime = 0;
 
         bool gatesClosed();
 
