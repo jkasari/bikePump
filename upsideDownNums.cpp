@@ -5,8 +5,15 @@
 
 
 DisplayControl::DisplayControl() :
-    LCD(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7)
-    { initNumbers(); }
+    LCD(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7) { 
+    pinMode(LCD_RS, OUTPUT);
+    pinMode(LCD_E, OUTPUT);
+    pinMode(LCD_D4, OUTPUT);
+    pinMode(LCD_D5, OUTPUT);
+    pinMode(LCD_D6, OUTPUT);
+    pinMode(LCD_D7, OUTPUT);
+    initNumbers(); 
+}
 
 void DisplayControl::displayNumber(float num) {
     LCD.clear();
