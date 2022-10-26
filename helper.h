@@ -108,7 +108,6 @@ class MainController {
         AirGate Gate_1;
         AirGate Gate_2;
         float OldPressures[STORED_PRESSURE_COUNT];
-        bool Stable = true;
         uint32_t StableCheckTime = 0;
         bool Manual = true;
         float Target = 0.0;

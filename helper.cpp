@@ -84,24 +84,29 @@ bool MainController::isStable(float pressure) {
         recordPressure(pressure);
         float ave = getAveragePressure();
         float diff = ave > pressure ? ave - pressure : pressure - ave;
+        if (!diff) { diff = 0; }
         if (gatesClosed() && diff < STABLE_TOLERANCE) {
-            Stable = true;
-            Serial.println(" Stable  : "+String(diff));
+            stable = true;
+            Serial.print(" Stable  : "+String(diff));
         } else {
-            Serial.println("Un Stable: "+String(diff));
+            Serial.print("Un Stable: "+String(diff));
         }
-    return Stable;
+    return stable;
 }
 
 void MainController::smartMode(float pressure) {
     if (isStable(pressure)) {
+        Serial.print("    Stable and Smart");
         if (!Manual) {
+            Serial.print("    Not Manual");
             touchTarget();
             float diff = pressure > Target ? pressure - Target : Target - pressure;
             if (diff > TOLERANCE) {
+                Serial.print("    Adjusting gates");
                 adjustGates(Target, pressure);
             } 
         } else {
+            Serial.print("   Set Target");
             Manual = false;
             Target = pressure;
         }
@@ -113,7 +118,6 @@ void MainController::manualMode(float pressure) {
     if (isStable(pressure)) {
         Target = pressure;
     }
-    touchTarget();
     if (Button_1.isPressed()) {
         calcAndOpenGate(true, 1);
     } else if (Button_2.isPressed()) {
@@ -174,6 +178,9 @@ float MainController::getAveragePressure() {
             nonZeroReadings += 1;
             sum += OldPressures[i] / 10;
         }
+    }
+    if (nonZeroReadings == 0) {
+        return 0;   
     }
     return (sum / nonZeroReadings) * 10;
 }

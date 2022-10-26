@@ -5,7 +5,7 @@
 #include <LiquidCrystal.h>
 
 #define PSI_CONSTANT 0.015625
-#define LOW_LIMIT 2
+#define LOW_LIMIT 1.99
 
 Adafruit_ADS1115 ADS;
 DisplayControl Display;
@@ -20,16 +20,18 @@ void setup() {
 
 void loop() {
     float currentPSI = getPressure();
-    //if (currentPSI > LOW_LIMIT) {
-    //    Controller.smartMode(currentPSI);
-    //} else {
-        Controller.isStable(currentPSI);
+    Serial.print("Target = : "+String(Controller.getTarget())+"   ");
+    Serial.print("Current = : "+String(currentPSI)+"   ");
+    if (currentPSI > LOW_LIMIT) {
+        Controller.smartMode(currentPSI);
+    } else {
         Controller.manualMode(currentPSI);
-        delay(5);
-    //}
+    }
     Display.displayNumber(currentPSI);
     //Serial.println("Target: "+String(Controller.getTarget()));
     Controller.checkGates();
+    Serial.println("");
+    delay(5);
 }
 
 
