@@ -81,13 +81,14 @@ bool MainController::gatesClosed() {
 bool MainController::isStable(float pressure) {
         StableCheckTime = millis();
         bool stable = false;
-        float diff = pressure > OldPressure ? pressure - OldPressure : OldPressure - pressure;
-        OldPressure = pressure;
+        recordPressure(pressure);
+        float ave = getAveragePressure();
+        float diff = ave > pressure ? ave - pressure : pressure - ave;
         if (gatesClosed() && diff < STABLE_TOLERANCE) {
             Stable = true;
-            Serial.println("Stable");
+            Serial.println(" Stable  : "+String(diff));
         } else {
-            Serial.println("Un Stable");
+            Serial.println("Un Stable: "+String(diff));
         }
     return Stable;
 }
@@ -156,6 +157,25 @@ void MainController::touchTarget() {
     if (0 > Target) {
         Target = 0;
     }
+}
+
+void MainController::recordPressure(float newPressure) {
+    for (int i = STORED_PRESSURE_COUNT - 1; i > 0; --i) {
+        OldPressures[i] = OldPressures[i-1];
+    }
+    OldPressures[0] = newPressure;
+}
+
+float MainController::getAveragePressure() {
+    float sum = 0;
+    float nonZeroReadings = 0;
+    for (int i = 0; i < STORED_PRESSURE_COUNT; ++i) {
+        if (OldPressures[i] != 0) {
+            nonZeroReadings += 1;
+            sum += OldPressures[i] / 10;
+        }
+    }
+    return (sum / nonZeroReadings) * 10;
 }
 
 float MainController::getTarget() {

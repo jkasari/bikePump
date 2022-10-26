@@ -11,7 +11,7 @@
 #define GATE_1 6
 #define GATE_2 7
 #define STABLE_TOLERANCE .1
-#define SETTLE_TIME 1000
+#define STORED_PRESSURE_COUNT 15
 #define TOLERANCE .5
 
 
@@ -107,7 +107,7 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
-        float OldPressure = 0;
+        float OldPressures[STORED_PRESSURE_COUNT];
         bool Stable = true;
         uint32_t StableCheckTime = 0;
         bool Manual = true;
@@ -121,4 +121,7 @@ class MainController {
 
         void touchTarget();
 
+        void recordPressure(float);
+
+        float getAveragePressure();
 };
