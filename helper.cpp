@@ -79,18 +79,16 @@ bool MainController::gatesClosed() {
 }
 
 bool MainController::isStable(float pressure) {
-    if (millis() - StableCheckTime > SETTLE_TIME) {
-        Serial.print("NotStable and : ");
         StableCheckTime = millis();
+        bool stable = false;
         float diff = pressure > OldPressure ? pressure - OldPressure : OldPressure - pressure;
         OldPressure = pressure;
-        if (gatesClosed() && diff > STABLE_TOLERANCE) {
-            //Serial.println("Not Stable at : "+String(diff));
-            Stable = false;
-        } else {
+        if (gatesClosed() && diff < STABLE_TOLERANCE) {
             Stable = true;
+            Serial.println("Stable");
+        } else {
+            Serial.println("Un Stable");
         }
-    }
     return Stable;
 }
 
@@ -139,7 +137,6 @@ void MainController::adjustGates(float target, float current) {
 void MainController::calcAndOpenGate(bool gateNum, float diff) {
     uint32_t waitTime = diff * ((-2/(diff+1)*1000)+2000);
     // Must be in milli seconds
-    Serial.println("And still openning a gate");
     if (gateNum) {
         Gate_1.turnGateOn(20);
     } else {
