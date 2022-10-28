@@ -8,11 +8,13 @@
 #define BUTTON5 A1
 #define BUTTON6 12
 #define GATE_NUM 2
-#define GATE_1 6
-#define GATE_2 7
-#define STABLE_TOLERANCE .1
+#define GATE_1 7
+#define GATE_2 6
+#define SETTLE_TIME 50
+#define STABLE_TOLERANCE .001
 #define STORED_PRESSURE_COUNT 15
 #define TOLERANCE .5
+#define MIN_OPEN_TIME 50
 
 
 /**
@@ -38,7 +40,7 @@ class AirGate {
         void turnGateOff();
 
         // Takes in the number of seconds you want the gate to be turned on for. 
-        void turnGateOn(uint8_t);
+        void turnGateOn(uint32_t);
 
         // Returns true if the gate is closed. 
         bool isClosed();
@@ -90,7 +92,9 @@ class MainController {
 
         bool isStable(float);
 
-        void checkGates();
+        bool checkGates();
+        
+        bool gatesClosed();
 
         void smartMode(float);
 
@@ -107,12 +111,11 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
+        uint32_t settleTimer = 100;
         float OldPressures[STORED_PRESSURE_COUNT];
         uint32_t StableCheckTime = 0;
         bool Manual = true;
         float Target = 0.0;
-
-        bool gatesClosed();
 
         void adjustGates(float, float);
 
