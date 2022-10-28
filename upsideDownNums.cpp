@@ -16,21 +16,26 @@ DisplayControl::DisplayControl() :
     initNumbers(); 
 }
 
-void DisplayControl::displayNumber(float num) {
-    LCD.clear();
+void DisplayControl::displayNumber(uint8_t startIndex, float num) {
     uint32_t temp = round(num*10);
-    uint8_t index = 0;
-    writeCorner(2, 0, 2, 3);
+    uint8_t index = startIndex;
+    writeCorner((index + 2), 0, 2, 3);
     while (temp > 0) {    
         uint32_t digit = temp % 10;
         writeDigit(index, digit);
-        if (index == 0) {
+        if (index == startIndex) {
             index += 3;
         } else {
             index += 2;
         }
         temp /= 10;
     }
+}
+
+void DisplayControl::displayTargetAndCurrent(float target, float current) {
+    LCD.clear();
+    displayNumber(0, current); 
+    displayNumber(9, target); 
 }
 
 void DisplayControl::writeDigit(uint8_t index, uint8_t digit) {

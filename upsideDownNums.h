@@ -14,7 +14,9 @@ class DisplayControl {
 
         DisplayControl();
 
-        void displayNumber(float);
+        void displayNumber(uint8_t, float);
+        
+        void displayTargetAndCurrent(float, float);
 
     private:
         LiquidCrystal LCD;
