@@ -13,7 +13,7 @@
 #define SETTLE_TIME 50
 #define STABLE_TOLERANCE .001
 #define STORED_PRESSURE_COUNT 15
-#define TOLERANCE .5
+#define TOLERANCE .3
 #define MIN_OPEN_TIME 50
 
 

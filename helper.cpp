@@ -109,7 +109,7 @@ void MainController::smartMode(float pressure) {
     if (isStable(pressure)) {
         if (!Manual) {
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            if (diff > TOLERANCE) {
+            if (0 > diff && diff > TOLERANCE) {
                 adjustGates(Target, pressure);
             } 
         } else {
