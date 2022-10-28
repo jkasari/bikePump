@@ -27,7 +27,7 @@ void loop() {
     } else {
         Controller.manualMode(currentPSI);
     }
-    Display.displayNumber(Controller.getTarget());
+    Display.displayTargetAndCurrent(Controller.getTarget(), currentPSI);
     //Serial.println("Target: "+String(Controller.getTarget()));
     Controller.checkGates();
     Serial.println("");
