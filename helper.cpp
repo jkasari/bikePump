@@ -24,7 +24,7 @@ void AirGate::turnGateOff() {
 
 void AirGate::turnGateOn(uint32_t milliSeconds) {
     if (milliSeconds < MIN_OPEN_TIME) {
-        milliSeconds = MIN_OPEN_TIME:
+        milliSeconds = MIN_OPEN_TIME;
     }
     openDuration = milliSeconds;
     flipGate(true);
@@ -109,7 +109,7 @@ void MainController::smartMode(float pressure) {
     if (isStable(pressure)) {
         if (!Manual) {
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            if (0 > diff && diff > TOLERANCE) {
+            if (Target > pressure || diff > TOLERANCE) {
                 adjustGates(Target, pressure);
             } 
         } else {
@@ -148,7 +148,7 @@ void MainController::adjustGates(float target, float current) {
 
 void MainController::calcAndOpenGate(bool gateNum, float diff) {
     //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
-    float waitTime = diff * 100;
+    float waitTime = diff * 200;
     waitTime = uint32_t(round(waitTime));
     // Must be in milli seconds
     if (gateNum) {
