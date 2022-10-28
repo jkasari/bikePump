@@ -22,7 +22,10 @@ void AirGate::turnGateOff() {
     flipGate(false);
 }
 
-void AirGate::turnGateOn(uint8_t milliSeconds) {
+void AirGate::turnGateOn(uint32_t milliSeconds) {
+    if (milliSeconds < MIN_OPEN_TIME) {
+        milliSeconds = MIN_OPEN_TIME:
+    }
     openDuration = milliSeconds;
     flipGate(true);
 }
@@ -75,7 +78,16 @@ void MainController::testingFunction(float pressure) {
 }
 
 bool MainController::gatesClosed() {
-    return Gate_1.isClosed() && Gate_2.isClosed();
+    bool ans = false;
+    if (Gate_2.isClosed() && Gate_1.isClosed()) {
+        settleTimer++;
+        if (millis() - settleTimer > SETTLE_TIME) {
+            ans = true;
+        }
+    } else {
+        settleTimer = millis();
+    }
+    return ans;
 }
 
 bool MainController::isStable(float pressure) {
@@ -87,10 +99,8 @@ bool MainController::isStable(float pressure) {
         if (!diff) { diff = 0; }
         if (gatesClosed() && diff < STABLE_TOLERANCE) {
             stable = true;
-            Serial.print(" Stable  : "+String(diff));
-        } else {
-            Serial.print("Un Stable: "+String(diff));
         }
+    //Serial.print("Stable : "+String(stable));
     return stable;
 }
 
@@ -99,12 +109,10 @@ void MainController::smartMode(float pressure) {
     if (isStable(pressure)) {
         if (!Manual) {
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            if (diff > TOLERANCE) {
-                Serial.print("    Adjusting gates");
+            if (0 > diff && diff > TOLERANCE) {
                 adjustGates(Target, pressure);
             } 
         } else {
-            Serial.print("   Set Target");
             Manual = false;
             Target = round(pressure);
         }
@@ -112,39 +120,41 @@ void MainController::smartMode(float pressure) {
 }
 
 void MainController::manualMode(float pressure) {
-    Manual = true;
     if (isStable(pressure)) {
+        Manual = true;
         Target = pressure;
     }
     if (Button_1.isPressed()) {
-        calcAndOpenGate(true, 1);
-    } else if (Button_2.isPressed()) {
         calcAndOpenGate(false, 1);
+    } else if (Button_2.isPressed()) {
+        calcAndOpenGate(true, 1);
     }
 }
 
-void MainController::checkGates() {
+bool MainController::checkGates() {
+    Gate_2.checkGate();
     Gate_1.checkGate();
-    Gate_2.checkGate(); 
 }
 
 void MainController::adjustGates(float target, float current) {
     float diff = target - current;
-    Serial.print("  pres diff : "+String(diff));
+    Serial.println("  target - current = diff : "+String(target)+" - "+String(current)+" = "+String(diff));
     if (diff > 0) {
-        calcAndOpenGate(false, diff);
+        calcAndOpenGate(true, diff);
     } else {
-        calcAndOpenGate(true, diff * -1);
+        calcAndOpenGate(false, diff * -1);
     }
 }
 
 void MainController::calcAndOpenGate(bool gateNum, float diff) {
-    uint32_t waitTime = diff * (-2000/(diff+1)+2000);
+    //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
+    float waitTime = diff * 100;
+    waitTime = uint32_t(round(waitTime));
     // Must be in milli seconds
     if (gateNum) {
         Gate_1.turnGateOn( waitTime);
     } else {
-        Gate_2.turnGateOn(waitTime/2);
+        Gate_2.turnGateOn(waitTime);
     }
 }
 

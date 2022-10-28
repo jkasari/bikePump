@@ -20,18 +20,16 @@ void setup() {
 
 void loop() {
     float currentPSI = getPressure();
-    Serial.print("Target = : "+String(Controller.getTarget())+"   ");
-    Serial.print("Current = : "+String(currentPSI)+"   ");
-    if (currentPSI > LOW_LIMIT) {
-        Controller.smartMode(currentPSI);
-    } else {
+    if (Controller.gatesClosed() && currentPSI < LOW_LIMIT) {
         Controller.manualMode(currentPSI);
+    } else {
+        Controller.smartMode(currentPSI);
     }
     Display.displayTargetAndCurrent(Controller.getTarget(), currentPSI);
     //Serial.println("Target: "+String(Controller.getTarget()));
     Controller.checkGates();
-    Serial.println("");
-    delay(5);
+    //Display.displayNumber(currentPSI);
+    //Serial.println(" Target/current : "+String(Controller.getTarget())+"/"+String(currentPSI));
 }
 
 
