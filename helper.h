@@ -73,10 +73,11 @@ class Button {
 
   private:
   uint32_t TimePressed; // keep track of how long the button has been pressed
-  uint8_t Port; // What pin on the arduino reads the button
+  uint8_t Pin; // What pin on the arduino reads the button
 };
 
 /**
+ * @brief Controls the gates and buttons.
  * Talks to the buttons, gates and pressure reader. 
  * Has functions that return usable data from these objects.
  */
@@ -85,20 +86,28 @@ class MainController {
 
     public:
 
-        MainController();
+        // Inits all the class members
+        MainController(); 
         
-        void testingFunction(float);
-
+        // Takes in the current pressure reading and returns true if it's stable compared to previous readings.
         bool isStable(float);
 
+        // Keeps track of how long gates have been open for and closes them if needed. Returns true if they are both closed.
+        // Needs to be called each time around the loop for the gates to work!
         bool checkGates();
-        
+
+        // Returns true if both the gates are closed.
         bool gatesClosed();
 
+        // Lets the arduino control the gates based on a set target pressure. 
+        // The target pressure is set by the buttons.
         void smartMode(float);
 
+        // Only activates the two main buttons and links each on to a gate. 
+        // Gates stay open for as long as a button is pressed. 
         void manualMode(float); 
 
+        // Returns whatever the target pressure is at the time.
         float getTarget();
 
     private:
@@ -110,9 +119,8 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
-        uint32_t settleTimer = 100;
-        float OldPressures[STORED_PRESSURE_COUNT];
-        uint32_t StableCheckTime = 0;
+        uint32_t settleTimer = 0; // Once the gates are closed this starts counting how long before we can check the pressure. 
+        float OldPressures[STORED_PRESSURE_COUNT]; // Storage of pressure readings to take an average of. 
         bool Manual = true;
         float Target = 0.0;
 

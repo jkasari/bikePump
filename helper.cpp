@@ -73,10 +73,6 @@ MainController::MainController() :
     Gate_1(GATE_1),
     Gate_2(GATE_2) {}
 
-void MainController::testingFunction(float pressure) {
-    isStable(pressure);
-}
-
 bool MainController::gatesClosed() {
     bool ans = false;
     if (Gate_2.isClosed() && Gate_1.isClosed()) {
