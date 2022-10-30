@@ -50,11 +50,11 @@ Button::Button(uint8_t Port) {
 uint32_t Button::hasBeenPressed() {
     uint32_t value = 0;
     if (isPressed()) {
-        Count++;
+        TimePressed++;
     }
-    if (!isPressed() && Count > 0) {
-        value = Count;
-        Count = 0;
+    if (!isPressed() && TimePressed > 0) {
+        value = TimePressed;
+        TimePressed = 0;
     }
     return value;
 }
