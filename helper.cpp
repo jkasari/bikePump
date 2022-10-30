@@ -42,9 +42,9 @@ bool AirGate::isClosed() {
     return closed;
 }
 
-Button::Button(uint8_t Port) { 
-    this->Port = Port; 
-    pinMode(Port, INPUT_PULLUP);
+Button::Button(uint8_t Pin) { 
+    this->Pin = Pin; 
+    pinMode(Pin, INPUT_PULLUP);
 }
 
 uint32_t Button::hasBeenPressed() {
@@ -60,7 +60,7 @@ uint32_t Button::hasBeenPressed() {
 }
 
 bool Button::isPressed() {
-    return digitalRead(Port) == LOW;
+    return digitalRead(Pin) == LOW;
 }
 
 MainController::MainController() : 
