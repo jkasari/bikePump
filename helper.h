@@ -1,20 +1,18 @@
 #include <Arduino.h>
 
-#define BUTTON_NUM 6
 #define BUTTON1 A3
 #define BUTTON2 10
 #define BUTTON3 11
 #define BUTTON4 A2
 #define BUTTON5 A1
 #define BUTTON6 12
-#define GATE_NUM 2
 #define GATE_1 7
 #define GATE_2 6
-#define SETTLE_TIME 50
-#define STABLE_TOLERANCE .001
-#define STORED_PRESSURE_COUNT 15
-#define TOLERANCE .3
-#define MIN_OPEN_TIME 50
+#define SETTLE_TIME 50 // The wait time in milliseconds before the mainController checks the pressure
+#define STABLE_TOLERANCE .001 // The limit for the differnce between the average of the stored readings an the current reading
+#define STORED_PRESSURE_COUNT 15 // How many readings are stored to later have the average calculated.
+#define TOLERANCE .3 // Limit on how close the program tries to get to the target pressure
+#define MIN_OPEN_TIME 50 // Minimum time the gates can be open for 
 
 
 /**
@@ -46,10 +44,11 @@ class AirGate {
         bool isClosed();
 
     private:
-        uint8_t Pin;
+        uint8_t Pin; // What arduino pin controls the gate
         bool closed = true;
-        uint32_t openDuration = 0;
-        uint32_t timeOpenned = 0;
+        uint32_t openDuration = 0; // the set time for a gate to be openned
+        uint32_t timeOpenned = 0; // Measure how long a gate has been open for
+        // turn the gate on or off directly. 
         void flipGate(bool);
 
 };
@@ -73,11 +72,12 @@ class Button {
   bool isPressed();
 
   private:
-  uint32_t Count;
-  uint8_t Port;
+  uint32_t TimePressed; // keep track of how long the button has been pressed
+  uint8_t Pin; // What pin on the arduino reads the button
 };
 
 /**
+ * @brief Controls the gates and buttons.
  * Talks to the buttons, gates and pressure reader. 
  * Has functions that return usable data from these objects.
  */
@@ -86,20 +86,28 @@ class MainController {
 
     public:
 
-        MainController();
+        // Inits all the class members
+        MainController(); 
         
-        void testingFunction(float);
-
+        // Takes in the current pressure reading and returns true if it's stable compared to previous readings.
         bool isStable(float);
 
+        // Keeps track of how long gates have been open for and closes them if needed. Returns true if they are both closed.
+        // Needs to be called each time around the loop for the gates to work!
         bool checkGates();
-        
+
+        // Returns true if both the gates are closed.
         bool gatesClosed();
 
+        // Lets the arduino control the gates based on a set target pressure. 
+        // The target pressure is set by the buttons.
         void smartMode(float);
 
+        // Only activates the two main buttons and links each on to a gate. 
+        // Gates stay open for as long as a button is pressed. 
         void manualMode(float); 
 
+        // Returns whatever the target pressure is at the time.
         float getTarget();
 
     private:
@@ -111,9 +119,8 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
-        uint32_t settleTimer = 100;
-        float OldPressures[STORED_PRESSURE_COUNT];
-        uint32_t StableCheckTime = 0;
+        uint32_t settleTimer = 0; // Once the gates are closed this starts counting how long before we can check the pressure. 
+        float OldPressures[STORED_PRESSURE_COUNT]; // Storage of pressure readings to take an average of. 
         bool Manual = true;
         float Target = 0.0;
 
