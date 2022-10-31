@@ -143,6 +143,9 @@ class MainController {
         float OldPressures[STORED_PRESSURE_COUNT]; // Storage of pressure readings to take an average of. 
         bool Manual = true;
         float Target = 0.0;
+        float PressureWhenOpenned = 0.0;
+        float Gate1PSISecond = 0.0; // Amount of pressure that flows in a second
+        float Gate2PSISecond = 0.0;
 
         void adjustGates(float, float);
 
