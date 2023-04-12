@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <LiquidCrystal.h>
+#include <BigNums2x2>
 
 #define BUTTON1 A3
 #define BUTTON2 10
@@ -13,7 +15,14 @@
 #define STORED_PRESSURE_COUNT 15 // How many readings are stored to later have the average calculated.
 #define TOLERANCE .3 // Limit on how close the program tries to get to the target pressure
 #define MIN_OPEN_TIME 50 // Minimum time the gates can be open for 
+#define TOLERANCE 10 // What does this do? is it left over?
 
+#define LCD_RS 3
+#define LCD_E 5
+#define LCD_D4 2
+#define LCD_D5 4
+#define LCD_D6 8
+#define LCD_D7 9
 
 /**
  * @brief A class that controls the basic functions of a gate.
@@ -110,7 +119,11 @@ class MainController {
         // Returns whatever the target pressure is at the time.
         float getTarget();
 
+        // Displays two floats using the bigNums library.
+        void displayNumbers()
+
     private:
+        LiquidCrystal LCD;
         Button Button_1;
         Button Button_2;
         Button Button_3;    

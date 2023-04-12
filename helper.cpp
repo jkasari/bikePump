@@ -1,4 +1,6 @@
+#include <Arduino.h>
 #include "helper.h"
+
 
 AirGate::AirGate(uint8_t Pin) {
     pinMode(Pin, OUTPUT);
@@ -65,6 +67,7 @@ bool Button::isPressed() {
 }
 
 MainController::MainController() : 
+    LCD(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7),
     Button_1(BUTTON1),
     Button_2(BUTTON2),
     Button_3(BUTTON3),
@@ -73,6 +76,13 @@ MainController::MainController() :
     Button_6(BUTTON6),
     Gate_1(GATE_1),
     Gate_2(GATE_2) {}
+    pinMode(LCD_RS, OUTPUT);
+    pinMode(LCD_E, OUTPUT);
+    pinMode(LCD_D4, OUTPUT);
+    pinMode(LCD_D5, OUTPUT);
+    pinMode(LCD_D6, OUTPUT);
+    pinMode(LCD_D7, OUTPUT);
+    LCD.begin(16, 2);
 
 bool MainController::gatesClosed() {
     bool ans = false;
