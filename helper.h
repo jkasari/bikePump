@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <LiquidCrystal.h>
+//#include <LiquidCrystal.h>
 #include <BigNums2x2.h>
 
 #define BUTTON1 6
@@ -125,6 +125,9 @@ class MainController {
 
         // Displays two floats using the bigNums library.
         void displayTargetAndCurrent(float, float);
+
+        // Prints out all the data to the serial port.
+        void printOutData(float);
 
     private:
         //LiquidCrystal lcd;

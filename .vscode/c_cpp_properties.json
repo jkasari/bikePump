@@ -16,25 +16,26 @@
             ],
             "intelliSenseMode": "gcc-x64",
             "includePath": [
-                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino",
-                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/variants/eightanaloginputs",
-                "/home/jkasari/ArduinoApp/arduino-nightly/libraries/LiquidCrystal/src",
-                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/Wire/src",
+                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino",
+                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/eightanaloginputs",
+                "/home/jkasari/Arduino/libraries/BigNums2x2/src",
+                "/home/jkasari/Arduino/libraries/LiquidCrystal/src",
+                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/Wire/src",
                 "/home/jkasari/Arduino/libraries/Adafruit_ADS1X15",
                 "/home/jkasari/Arduino/libraries/Adafruit_BusIO",
-                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src",
+                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/SPI/src",
                 "/home/jkasari/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/lib/gcc/avr/7.3.0/include",
                 "/home/jkasari/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/lib/gcc/avr/7.3.0/include-fixed",
                 "/home/jkasari/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/avr/include"
             ],
             "forcedInclude": [
-                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino/Arduino.h"
+                "/home/jkasari/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Arduino.h"
             ],
             "cStandard": "c11",
             "cppStandard": "c++11",
             "defines": [
                 "F_CPU=16000000L",
-                "ARDUINO=10820",
+                "ARDUINO=10607",
                 "ARDUINO_AVR_NANO",
                 "ARDUINO_ARCH_AVR",
                 "__DBL_MIN_EXP__=(-125)",

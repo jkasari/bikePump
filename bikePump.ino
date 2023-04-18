@@ -31,7 +31,7 @@ void loop() {
     //Serial.println("Target: "+String(Controller.getTarget()));
     Controller.checkGates();
     //Display.displayNumber(currentPSI);
-    //Serial.println(" Target/current : "+String(Controller.getTarget())+"/"+String(currentPSI));
+    Controller.printOutData(currentPSI);
 }
 
 

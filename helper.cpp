@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "helper.h"
+#include <LiquidCrystal.h>
 
 LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 AirGate::AirGate(uint8_t Pin) {
@@ -136,9 +137,9 @@ void MainController::manualMode(float pressure) {
         Target = pressure; // Set the target to whatever the current pressure is.
     }
     uint8_t waitTime = 200; // keep the gate open for long enough to go around the loop and few times. 
-    if (Button_1.isPressed()) {
+    if (Button_2.isPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
         Gate_1.turnGateOn(waitTime);
-    } else if (Button_2.isPressed()) {
+    } else if (Button_1.isPressed()) {
         Gate_2.turnGateOn(waitTime);
     }
 }
@@ -232,4 +233,18 @@ void MainController::displayTargetAndCurrent(float targetPSI, float currentPSI) 
       oldCurrentPSI = currentPSI;
     }
 
+}
+
+void MainController::printOutData(float currentPsi) {
+    Serial.print("Target: ");
+    Serial.print(getTarget());
+    Serial.print(" | ");
+
+    Serial.print("Current: ");
+    Serial.print(currentPsi);
+    Serial.print(" | ");
+    
+    Serial.print("Is Stable: ");
+    Serial.print(isStable(currentPsi));
+    Serial.print(" | ");
 }
