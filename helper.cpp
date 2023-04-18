@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "helper.h"
 
-
+LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 AirGate::AirGate(uint8_t Pin) {
     pinMode(Pin, OUTPUT);
     this->Pin = Pin;
@@ -67,22 +67,27 @@ bool Button::isPressed() {
 }
 
 MainController::MainController() : 
-    LCD(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7),
+
     Button_1(BUTTON1),
     Button_2(BUTTON2),
     Button_3(BUTTON3),
     Button_4(BUTTON4),
     Button_5(BUTTON5),
     Button_6(BUTTON6),
+    BigNums(NASA),
     Gate_1(GATE_1),
-    Gate_2(GATE_2) {}
-    pinMode(LCD_RS, OUTPUT);
-    pinMode(LCD_E, OUTPUT);
-    pinMode(LCD_D4, OUTPUT);
-    pinMode(LCD_D5, OUTPUT);
-    pinMode(LCD_D6, OUTPUT);
-    pinMode(LCD_D7, OUTPUT);
-    LCD.begin(16, 2);
+    Gate_2(GATE_2) {
+        pinMode(LCD_RS, OUTPUT);
+        pinMode(LCD_E, OUTPUT);
+        pinMode(LCD_D4, OUTPUT);
+        pinMode(LCD_D5, OUTPUT);
+        pinMode(LCD_D6, OUTPUT);
+        pinMode(LCD_D7, OUTPUT);
+    }
+
+void MainController::begin() {
+  lcd.begin(16, 2);
+}
 
 bool MainController::gatesClosed() {
     bool ans = false;
@@ -132,9 +137,9 @@ void MainController::manualMode(float pressure) {
     }
     uint8_t waitTime = 200; // keep the gate open for long enough to go around the loop and few times. 
     if (Button_1.isPressed()) {
-        Gate_2.turnGateOn(waitTime);
-    } else if (Button_2.isPressed()) {
         Gate_1.turnGateOn(waitTime);
+    } else if (Button_2.isPressed()) {
+        Gate_2.turnGateOn(waitTime);
     }
 }
 
@@ -216,4 +221,15 @@ float MainController::getAveragePressure() {
 
 float MainController::getTarget() {
     return Target;
+}
+
+void MainController::displayTargetAndCurrent(float targetPSI, float currentPSI) {
+    if (targetPSI != oldTargetPSI || currentPSI != oldCurrentPSI) {
+      lcd.clear();
+      BigNums.printShortFloat(targetPSI, 1, 2, 0, 0);
+      BigNums.printShortFloat(currentPSI, 1, 2, 9, 0);
+      oldTargetPSI = targetPSI;
+      oldCurrentPSI = currentPSI;
+    }
+
 }
