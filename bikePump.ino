@@ -1,21 +1,20 @@
 #include "helper.h"
-#include "upsideDownNums.h"
 #include <Wire.h>
 #include <Adafruit_ADS1X15.h>
-#include <LiquidCrystal.h>
-
 #define PSI_CONSTANT 0.015625
 #define LOW_LIMIT 1.99 // The numbers that decideds what mode to go into. 
+#define SCREEN_RATE 150
 
 Adafruit_ADS1115 ADS;
-DisplayControl Display;
 MainController Controller;
+uint32_t timer = 0;
 
 void setup() {
     Serial.begin(115200);
     Wire.begin();
     ADS.begin();
     ADS.setGain(GAIN_SIXTEEN);
+    Controller.begin();
 }
 
 void loop() {
@@ -25,11 +24,14 @@ void loop() {
     } else { // Otherwise, go into manual mode. This happens when no tire is attached to the pump. 
         Controller.smartMode(currentPSI);
     }
-    Display.displayTargetAndCurrent(Controller.getTarget(), currentPSI);
+    if (millis() - timer > SCREEN_RATE) {
+        Controller.displayTargetAndCurrent(Controller.getTarget(), currentPSI);
+        timer = millis();
+    }
     //Serial.println("Target: "+String(Controller.getTarget()));
     Controller.checkGates();
     //Display.displayNumber(currentPSI);
-    //Serial.println(" Target/current : "+String(Controller.getTarget())+"/"+String(currentPSI));
+    //printOutData(currentPSI, Controller.getTarget(), Controller.isStable(currentPSI));
 }
 
 
@@ -39,4 +41,17 @@ float getPressure() {
         pressure = 0; // Doesn't let any negative pressures come through
     }
     return pressure * PSI_CONSTANT;
+}
+
+void printOutData(float currentPsi, float target, bool stable) {
+    Serial.print("Target: ");
+    Serial.print(target);
+    Serial.print(" | ");
+
+    Serial.print("Current: ");
+    Serial.print(currentPsi);
+    Serial.print(" | ");
+    
+    Serial.print("Is Stable: ");
+    Serial.println(stable);
 }

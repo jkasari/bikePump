@@ -1,18 +1,28 @@
 #include <Arduino.h>
+//#include <LiquidCrystal.h>
+#include <BigNums2x2.h>
 
-#define BUTTON1 A3
-#define BUTTON2 10
-#define BUTTON3 11
-#define BUTTON4 A2
-#define BUTTON5 A1
-#define BUTTON6 12
-#define GATE_1 7
-#define GATE_2 6
+#define BUTTON1 6
+#define BUTTON2 7
+#define BUTTON3 10
+#define BUTTON4 A3
+#define BUTTON5 A6
+#define BUTTON6 A7
+#define GATE_1 A1 
+#define GATE_2 A2
 #define SETTLE_TIME 50 // The wait time in milliseconds before the mainController checks the pressure
 #define STABLE_TOLERANCE .001 // The limit for the differnce between the average of the stored readings an the current reading
 #define STORED_PRESSURE_COUNT 15 // How many readings are stored to later have the average calculated.
-#define TOLERANCE .3 // Limit on how close the program tries to get to the target pressure
+#define TOLERANCE 3 // Limit on how close the program tries to get to the target pressure
 #define MIN_OPEN_TIME 50 // Minimum time the gates can be open for 
+#define TOLERANCE 10 // What does this do? is it left over?
+
+#define LCD_RS 3
+#define LCD_E 5
+#define LCD_D4 2
+#define LCD_D5 4
+#define LCD_D6 8
+#define LCD_D7 9
 
 
 /**
@@ -88,6 +98,9 @@ class MainController {
 
         // Inits all the class members
         MainController(); 
+
+        // This is for the lcd screen
+        void begin();
         
         // Takes in the current pressure reading and returns true if it's stable compared to previous readings.
         bool isStable(float);
@@ -110,7 +123,12 @@ class MainController {
         // Returns whatever the target pressure is at the time.
         float getTarget();
 
+        // Displays two floats using the bigNums library.
+        void displayTargetAndCurrent(float, float);
+
     private:
+        //LiquidCrystal lcd;
+        BigNums2x2 BigNums;
         Button Button_1;
         Button Button_2;
         Button Button_3;    
@@ -119,6 +137,8 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
+        float oldTargetPSI;
+        float oldCurrentPSI;
         uint32_t settleTimer = 0; // Once the gates are closed this starts counting how long before we can check the pressure. 
         float OldPressures[STORED_PRESSURE_COUNT]; // Storage of pressure readings to take an average of. 
         bool Manual = true;

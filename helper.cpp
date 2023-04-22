@@ -1,5 +1,8 @@
+#include <Arduino.h>
 #include "helper.h"
+#include <LiquidCrystal.h>
 
+LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 AirGate::AirGate(uint8_t Pin) {
     pinMode(Pin, OUTPUT);
     this->Pin = Pin;
@@ -65,14 +68,27 @@ bool Button::isPressed() {
 }
 
 MainController::MainController() : 
+
     Button_1(BUTTON1),
     Button_2(BUTTON2),
     Button_3(BUTTON3),
     Button_4(BUTTON4),
     Button_5(BUTTON5),
     Button_6(BUTTON6),
+    BigNums(NASA),
     Gate_1(GATE_1),
-    Gate_2(GATE_2) {}
+    Gate_2(GATE_2) {
+        pinMode(LCD_RS, OUTPUT);
+        pinMode(LCD_E, OUTPUT);
+        pinMode(LCD_D4, OUTPUT);
+        pinMode(LCD_D5, OUTPUT);
+        pinMode(LCD_D6, OUTPUT);
+        pinMode(LCD_D7, OUTPUT);
+    }
+
+void MainController::begin() {
+  lcd.begin(16, 2);
+}
 
 bool MainController::gatesClosed() {
     bool ans = false;
@@ -92,7 +108,7 @@ bool MainController::isStable(float pressure) {
         recordPressure(pressure); // record the new pressure to the recorded pressures.
         float ave = getAveragePressure(); // Get the average of the recorded pressures. 
         float diff = ave > pressure ? ave - pressure : pressure - ave; // Get the diff between the new pressure and average pressures.
-        if (!diff) { diff = 0; } // unsure why this is here??
+        if (!diff) { diff = 0; } // For start up edge case when there is no ave pressure. 
         if (gatesClosed() && diff < STABLE_TOLERANCE) {
             stable = true; // If the gates are closed and the diff is within tolerance, set return value to true.
         }
@@ -100,12 +116,16 @@ bool MainController::isStable(float pressure) {
     return stable;
 }
 
+// CHANGED HERE
 void MainController::smartMode(float pressure) {
     touchTarget(); // check the buttons for any changes in the target. 
     if (isStable(pressure)) { // Only continue if we have a stable pressure.
         if (!Manual) { // If we were not just in manual mode. 
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            if (Target > pressure || diff > TOLERANCE) {
+            if (diff > TOLERANCE) {
+              Serial.println("gates should adjust");
+            }
+            if (Target > pressure || diff > .3) {
                 adjustGates(Target, pressure);
             } 
         } else { // If we just came out of manual mode, set the target to the current pressure. This happens when you first connect a tire to the pump. 
@@ -121,10 +141,10 @@ void MainController::manualMode(float pressure) {
         Target = pressure; // Set the target to whatever the current pressure is.
     }
     uint8_t waitTime = 200; // keep the gate open for long enough to go around the loop and few times. 
-    if (Button_1.isPressed()) {
-        Gate_2.turnGateOn(waitTime);
-    } else if (Button_2.isPressed()) {
+    if (Button_2.isPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
         Gate_1.turnGateOn(waitTime);
+    } else if (Button_1.isPressed()) {
+        Gate_2.turnGateOn(waitTime);
     }
 }
 
@@ -143,9 +163,11 @@ void MainController::adjustGates(float target, float current) {
     }
 }
 
+
+//CHANGED HERE
 void MainController::calcAndOpenGate(bool gateNum, float diff) {
     //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
-    float waitTime = diff * 200; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
+    float waitTime = diff * 50; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
     waitTime = uint32_t(round(waitTime));
     // Must be in milli seconds
     if (gateNum) {// choose which gate to open. 
@@ -206,4 +228,15 @@ float MainController::getAveragePressure() {
 
 float MainController::getTarget() {
     return Target;
+}
+
+void MainController::displayTargetAndCurrent(float targetPSI, float currentPSI) {
+    if (targetPSI != oldTargetPSI || currentPSI != oldCurrentPSI) {
+      lcd.clear();
+      BigNums.printShortFloat(targetPSI, 1, 2, 0, 0);
+      BigNums.printShortFloat(currentPSI, 1, 2, 9, 0);
+      oldTargetPSI = targetPSI;
+      oldCurrentPSI = currentPSI;
+    }
+
 }

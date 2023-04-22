@@ -2,5 +2,5 @@
     "port": "/dev/ttyUSB0",
     "board": "arduino:avr:nano",
     "sketch": "bikePump.ino",
-    "programmer": "arduino:avrispmkii"
+    "programmer": "arduinoasispatmega32u4"
 }
