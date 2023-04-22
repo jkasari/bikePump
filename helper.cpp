@@ -12,7 +12,7 @@ bool AirGate::checkGate() {
     if (!closed) {
         // If the gate is open, check to see how long.
         if (millis() - timeOpenned > openDuration) {
-            turnGateOff; // If its longer then the set time, close it. 
+            turnGateOff(); // If its longer then the set time, close it. 
         }
     }
     return closed; // Returns true if the gate is closed.
@@ -182,17 +182,17 @@ void MainController::adjustGates(float targetPSI, float currentPSI, float diff) 
 
 
 //CHANGED HERE
-void MainController::calcAndOpenGate(bool gateOneorTwo, float diff) {
-    //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
-    float waitTime = diff * 50; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
-    waitTime = uint32_t(round(waitTime));
-    // Must be in milli seconds
-    if (gateOneorTwo) {// choose which gate to open. 
-        Gate_1.turnGateOn( waitTime);
-    } else {
-        Gate_2.turnGateOn(waitTime);
-    }
-}
+//void MainController::calcAndOpenGate(bool gateOneorTwo, float diff) {
+//    //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
+//    float waitTime = diff * 50; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
+//    waitTime = uint32_t(round(waitTime));
+//    // Must be in milli seconds
+//    if (gateOneorTwo) {// choose which gate to open. 
+//        Gate_1.turnGateOn( waitTime);
+//    } else {
+//        Gate_2.turnGateOn(waitTime);
+//    }
+//}
 
 void MainController::touchTarget() {
     // Brute force baby!!!
