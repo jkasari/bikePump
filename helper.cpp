@@ -12,7 +12,7 @@ bool AirGate::checkGate() {
     if (!closed) {
         // If the gate is open, check to see how long.
         if (millis() - timeOpenned > openDuration) {
-            flipGate(false); // If its longer then the set time, close it. 
+            turnGateOff; // If its longer then the set time, close it. 
         }
     }
     return closed; // Returns true if the gate is closed.
@@ -26,10 +26,14 @@ void AirGate::turnGateOff() {
     flipGate(false);
 }
 
-void AirGate::turnGateOn(uint32_t milliSeconds) {
+void AirGate::turnGateOn(float diff, float currentPSI) {
+    float psiDiff = oldPSI > currentPSI ? oldPSI - currentPSI : currentPSI - oldPSI; 
+    flowRate = (psiDiff * 1000) / openDuration;
+    uint32_t milliSeconds = uint32_t(diff*flowRate*1000);
     if (milliSeconds < MIN_OPEN_TIME) {
         milliSeconds = MIN_OPEN_TIME; // If the number is to small set it to the minimum time.
     }
+    oldPSI = currentPSI;
     openDuration = milliSeconds;
     flipGate(true); // Open the gate. 
 }
@@ -44,6 +48,10 @@ void AirGate::flipGate(bool highOrLow) {
 
 bool AirGate::isClosed() {
     return closed;
+}
+
+uint32_t AirGate::getTimeOpen() {
+    return timeOpenned;
 }
 
 Button::Button(uint8_t Pin) { 
@@ -122,11 +130,8 @@ void MainController::smartMode(float pressure) {
     if (isStable(pressure)) { // Only continue if we have a stable pressure.
         if (!Manual) { // If we were not just in manual mode. 
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            if (diff > TOLERANCE) {
-              Serial.println("gates should adjust");
-            }
             if (Target > pressure || diff > .3) {
-                adjustGates(Target, pressure);
+                adjustGates(Target, pressure, diff);
             } 
         } else { // If we just came out of manual mode, set the target to the current pressure. This happens when you first connect a tire to the pump. 
             Manual = false;
@@ -153,28 +158,36 @@ void MainController::manualMode(float pressure) {
 }
 
 bool MainController::checkGates() {
-    Gate_2.checkGate();
     Gate_1.checkGate();
+    Gate_2.checkGate();
 }
 
-void MainController::adjustGates(float target, float current) {
-    float diff = target - current; 
-    //Serial.println("  target - current = diff : "+String(target)+" - "+String(current)+" = "+String(diff));
-    if (diff > 0) { // calcAndOpenGate needs a positive number, so we mulitple negative differences by -1. 
-        calcAndOpenGate(true, diff);
+void MainController::adjustGates(float targetPSI, float currentPSI, float diff) {
+    if (targetPSI > currentPSI) {
+        Gate_1.turnGateOn(diff, currentPSI);
     } else {
-        calcAndOpenGate(false, diff * -1);
+        Gate_2.turnGateOn(diff, currentPSI);
     }
 }
 
+//void MainController::adjustGates(float target, float current) {
+//    float diff = target - current; 
+//    //Serial.println("  target - current = diff : "+String(target)+" - "+String(current)+" = "+String(diff));
+//    if (diff > 0) { // calcAndOpenGate needs a positive number, so we mulitple negative differences by -1. 
+//        calcAndOpenGate(true, diff);
+//    } else {
+//        calcAndOpenGate(false, diff * -1);
+//    }
+//}
+
 
 //CHANGED HERE
-void MainController::calcAndOpenGate(bool gateNum, float diff) {
+void MainController::calcAndOpenGate(bool gateOneorTwo, float diff) {
     //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
     float waitTime = diff * 50; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
     waitTime = uint32_t(round(waitTime));
     // Must be in milli seconds
-    if (gateNum) {// choose which gate to open. 
+    if (gateOneorTwo) {// choose which gate to open. 
         Gate_1.turnGateOn( waitTime);
     } else {
         Gate_2.turnGateOn(waitTime);
