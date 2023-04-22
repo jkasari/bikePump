@@ -31,7 +31,7 @@ void loop() {
     //Serial.println("Target: "+String(Controller.getTarget()));
     Controller.checkGates();
     //Display.displayNumber(currentPSI);
-    Controller.printOutData(currentPSI);
+    //printOutData(currentPSI, Controller.getTarget(), Controller.isStable(currentPSI));
 }
 
 
@@ -41,4 +41,17 @@ float getPressure() {
         pressure = 0; // Doesn't let any negative pressures come through
     }
     return pressure * PSI_CONSTANT;
+}
+
+void printOutData(float currentPsi, float target, bool stable) {
+    Serial.print("Target: ");
+    Serial.print(target);
+    Serial.print(" | ");
+
+    Serial.print("Current: ");
+    Serial.print(currentPsi);
+    Serial.print(" | ");
+    
+    Serial.print("Is Stable: ");
+    Serial.println(stable);
 }

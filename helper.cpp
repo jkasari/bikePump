@@ -108,7 +108,7 @@ bool MainController::isStable(float pressure) {
         recordPressure(pressure); // record the new pressure to the recorded pressures.
         float ave = getAveragePressure(); // Get the average of the recorded pressures. 
         float diff = ave > pressure ? ave - pressure : pressure - ave; // Get the diff between the new pressure and average pressures.
-        if (!diff) { diff = 0; } // unsure why this is here??
+        if (!diff) { diff = 0; } // For start up edge case when there is no ave pressure. 
         if (gatesClosed() && diff < STABLE_TOLERANCE) {
             stable = true; // If the gates are closed and the diff is within tolerance, set return value to true.
         }
@@ -116,12 +116,16 @@ bool MainController::isStable(float pressure) {
     return stable;
 }
 
+// CHANGED HERE
 void MainController::smartMode(float pressure) {
     touchTarget(); // check the buttons for any changes in the target. 
     if (isStable(pressure)) { // Only continue if we have a stable pressure.
         if (!Manual) { // If we were not just in manual mode. 
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            if (Target > pressure || diff > TOLERANCE) {
+            if (diff > TOLERANCE) {
+              Serial.println("gates should adjust");
+            }
+            if (Target > pressure || diff > .3) {
                 adjustGates(Target, pressure);
             } 
         } else { // If we just came out of manual mode, set the target to the current pressure. This happens when you first connect a tire to the pump. 
@@ -159,9 +163,11 @@ void MainController::adjustGates(float target, float current) {
     }
 }
 
+
+//CHANGED HERE
 void MainController::calcAndOpenGate(bool gateNum, float diff) {
     //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
-    float waitTime = diff * 200; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
+    float waitTime = diff * 50; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
     waitTime = uint32_t(round(waitTime));
     // Must be in milli seconds
     if (gateNum) {// choose which gate to open. 
@@ -233,18 +239,4 @@ void MainController::displayTargetAndCurrent(float targetPSI, float currentPSI) 
       oldCurrentPSI = currentPSI;
     }
 
-}
-
-void MainController::printOutData(float currentPsi) {
-    Serial.print("Target: ");
-    Serial.print(getTarget());
-    Serial.print(" | ");
-
-    Serial.print("Current: ");
-    Serial.print(currentPsi);
-    Serial.print(" | ");
-    
-    Serial.print("Is Stable: ");
-    Serial.print(isStable(currentPsi));
-    Serial.print(" | ");
 }

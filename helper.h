@@ -13,7 +13,7 @@
 #define SETTLE_TIME 50 // The wait time in milliseconds before the mainController checks the pressure
 #define STABLE_TOLERANCE .001 // The limit for the differnce between the average of the stored readings an the current reading
 #define STORED_PRESSURE_COUNT 15 // How many readings are stored to later have the average calculated.
-#define TOLERANCE .3 // Limit on how close the program tries to get to the target pressure
+#define TOLERANCE 3 // Limit on how close the program tries to get to the target pressure
 #define MIN_OPEN_TIME 50 // Minimum time the gates can be open for 
 #define TOLERANCE 10 // What does this do? is it left over?
 
@@ -125,9 +125,6 @@ class MainController {
 
         // Displays two floats using the bigNums library.
         void displayTargetAndCurrent(float, float);
-
-        // Prints out all the data to the serial port.
-        void printOutData(float);
 
     private:
         //LiquidCrystal lcd;
