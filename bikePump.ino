@@ -8,6 +8,7 @@
 Adafruit_ADS1115 ADS;
 MainController Controller;
 uint32_t timer = 0;
+uint32_t lastStablePressure = 0;
 
 void setup() {
     Serial.begin(115200);
@@ -19,17 +20,20 @@ void setup() {
 
 void loop() {
     float currentPSI = getPressure(); // Get the current pressure
-    if (Controller.gatesClosed() && currentPSI < LOW_LIMIT) { // If the gates are closed and the current psi is below the low limit, go into smart mode. 
+    if (Controller.isStable(currentPSI)) {
+      lastStablePressure = currentPSI;
+    }
+    if (lastStablePressure < LOW_LIMIT) { // If the gates are closed and the current psi is below the low limit, go into smart mode. 
         Controller.manualMode(currentPSI);
     } else { // Otherwise, go into manual mode. This happens when no tire is attached to the pump. 
-        Controller.smartMode(currentPSI);
+        //Controller.smartMode(currentPSI);
     }
     if (millis() - timer > SCREEN_RATE) {
         Controller.displayTargetAndCurrent(Controller.getTarget(), currentPSI);
         timer = millis();
     }
     //Serial.println("Target: "+String(Controller.getTarget()));
-    Controller.checkGates();
+    //Controller.checkGates();
     //Display.displayNumber(currentPSI);
     //printOutData(currentPSI, Controller.getTarget(), Controller.isStable(currentPSI));
 }

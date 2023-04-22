@@ -53,8 +53,8 @@ class AirGate {
         // Returns true if the gate is closed. 
         bool isClosed();
 
-        // Returns the time the gate has been set to open for.
-        uint32_t getTimeOpen(void);
+        // reset the oldPSI and openDuration data members. 
+        void resetGate(float);
 
     private:
         uint8_t Pin; // What arduino pin controls the gate
@@ -84,7 +84,7 @@ class Button {
   uint32_t hasBeenPressed();
 
   // Returns true when the button is pressed and false when released.
-  bool isPressed();
+  bool currentlyPressed();
 
   private:
   uint32_t TimePressed; // keep track of how long the button has been pressed

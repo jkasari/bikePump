@@ -20,15 +20,21 @@ bool AirGate::checkGate() {
 
 void AirGate::turnGateOn() {
     flipGate(true);
+    Serial.println("gate on");
 }
 
 void AirGate::turnGateOff() {
     flipGate(false);
+    Serial.println("gate off");
 }
 
 void AirGate::turnGateOn(float diff, float currentPSI) {
     float psiDiff = oldPSI > currentPSI ? oldPSI - currentPSI : currentPSI - oldPSI; 
-    flowRate = (psiDiff * 1000) / openDuration;
+    if (openDuration != 0) {
+        flowRate = (psiDiff * 1000) / openDuration;
+    } else {
+        openDuration = 0;
+    }
     uint32_t milliSeconds = uint32_t(diff*flowRate*1000);
     if (milliSeconds < MIN_OPEN_TIME) {
         milliSeconds = MIN_OPEN_TIME; // If the number is to small set it to the minimum time.
@@ -46,12 +52,13 @@ void AirGate::flipGate(bool highOrLow) {
     digitalWrite(Pin, int(highOrLow)); // set the gate pin to on or off. 
 }
 
-bool AirGate::isClosed() {
-    return closed;
+void AirGate::resetGate(float currentPSI) {
+    oldPSI = currentPSI;
+    openDuration = 0;
 }
 
-uint32_t AirGate::getTimeOpen() {
-    return timeOpenned;
+bool AirGate::isClosed() {
+    return closed;
 }
 
 Button::Button(uint8_t Pin) { 
@@ -61,17 +68,17 @@ Button::Button(uint8_t Pin) {
 
 uint32_t Button::hasBeenPressed() {
     uint32_t value = 0;
-    if (isPressed()) {
+    if (currentlyPressed()) {
         TimePressed++; // If currently pressed, increment the time pressed. 
     }
-    if (!isPressed() && TimePressed > 0) {
+    if (!currentlyPressed() && TimePressed > 0) {
         value = TimePressed; // If the button is not pressed but has a record of being pressed, reset the time pressed and return how long it was pressed for. 
         TimePressed = 0;
     }
     return value;
 }
 
-bool Button::isPressed() {
+bool Button::currentlyPressed() {
     return digitalRead(Pin) == LOW; // Return if the pin has been pulled up. 
 }
 
@@ -136,24 +143,26 @@ void MainController::smartMode(float pressure) {
         } else { // If we just came out of manual mode, set the target to the current pressure. This happens when you first connect a tire to the pump. 
             Manual = false;
             Target = round(pressure); // Round to the nearest non float number. 
+            Gate_1.resetGate(pressure);
+            Gate_2.resetGate(pressure);
         }
     }
 }
 
 void MainController::manualMode(float pressure) {
-    if (isStable(pressure)) { // check to make sure the pressure is stable before continuing
+    //if (isStable(pressure)) { // check to make sure the pressure is stable before continuing
         Manual = true; // Record that we are in manual mode.
         Target = pressure; // Set the target to whatever the current pressure is.
-    }
-    if (Button_2.isPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
+    //}
+    if (Button_2.currentlyPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
         Gate_1.turnGateOn();
     } else {
         Gate_1.turnGateOff();
     }
-    if (Button_2.isPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
-        Gate_1.turnGateOn();
+    if (Button_1.currentlyPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
+        Gate_2.turnGateOn();
     } else {
-        Gate_1.turnGateOff();
+        Gate_2.turnGateOff();
     }
 }
 
