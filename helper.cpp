@@ -140,11 +140,15 @@ void MainController::manualMode(float pressure) {
         Manual = true; // Record that we are in manual mode.
         Target = pressure; // Set the target to whatever the current pressure is.
     }
-    uint8_t waitTime = 200; // keep the gate open for long enough to go around the loop and few times. 
     if (Button_2.isPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
-        Gate_1.turnGateOn(waitTime);
-    } else if (Button_1.isPressed()) {
-        Gate_2.turnGateOn(waitTime);
+        Gate_1.turnGateOn();
+    } else {
+        Gate_1.turnGateOff();
+    }
+    if (Button_2.isPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
+        Gate_1.turnGateOn();
+    } else {
+        Gate_1.turnGateOff();
     }
 }
 
