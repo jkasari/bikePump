@@ -137,6 +137,7 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
+        float bias;
         float oldTargetPSI;
         float oldCurrentPSI;
         uint32_t settleTimer = 0; // Once the gates are closed this starts counting how long before we can check the pressure. 
