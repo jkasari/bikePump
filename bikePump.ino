@@ -26,14 +26,14 @@ void loop() {
     if (lastStablePressure < LOW_LIMIT) { // If the gates are closed and the current psi is below the low limit, go into smart mode. 
         Controller.manualMode(currentPSI);
     } else { // Otherwise, go into manual mode. This happens when no tire is attached to the pump. 
-        //Controller.smartMode(currentPSI);
+        Controller.smartMode(currentPSI);
     }
     if (millis() - timer > SCREEN_RATE) {
         Controller.displayTargetAndCurrent(Controller.getTarget(), currentPSI);
         timer = millis();
     }
     //Serial.println("Target: "+String(Controller.getTarget()));
-    //Controller.checkGates();
+    Controller.checkGates();
     //Display.displayNumber(currentPSI);
     //printOutData(currentPSI, Controller.getTarget(), Controller.isStable(currentPSI));
 }

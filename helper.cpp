@@ -20,12 +20,10 @@ bool AirGate::checkGate() {
 
 void AirGate::turnGateOn() {
     flipGate(true);
-    Serial.println("gate on");
 }
 
 void AirGate::turnGateOff() {
     flipGate(false);
-    Serial.println("gate off");
 }
 
 void AirGate::turnGateOn(float diff, float currentPSI) {
@@ -33,14 +31,26 @@ void AirGate::turnGateOn(float diff, float currentPSI) {
     if (openDuration != 0) {
         flowRate = (psiDiff * 1000) / openDuration;
     } else {
-        openDuration = 0;
+        flowRate = .1;
     }
-    uint32_t milliSeconds = uint32_t(diff*flowRate*1000);
+    uint32_t milliSeconds = uint32_t(diff*flowRate);
     if (milliSeconds < MIN_OPEN_TIME) {
         milliSeconds = MIN_OPEN_TIME; // If the number is to small set it to the minimum time.
     }
     oldPSI = currentPSI;
     openDuration = milliSeconds;
+    Serial.print("open duration: ");
+    Serial.print(openDuration);
+    Serial.print("  PSI diff: ");
+    Serial.print(psiDiff);
+    Serial.print("  pressure diff: ");
+    Serial.print(diff);
+    Serial.print("  flow rate: ");
+    Serial.print(flowRate);
+    Serial.print("  Old PSI: ");
+    Serial.print(oldPSI);
+    Serial.print("  current PSI: ");
+    Serial.println(currentPSI);
     flipGate(true); // Open the gate. 
 }
 
@@ -173,8 +183,10 @@ bool MainController::checkGates() {
 
 void MainController::adjustGates(float targetPSI, float currentPSI, float diff) {
     if (targetPSI > currentPSI) {
+        Serial.print("gate 1: ");
         Gate_1.turnGateOn(diff, currentPSI);
     } else {
+        Serial.print("gate 2: ");
         Gate_2.turnGateOn(diff, currentPSI);
     }
 }
