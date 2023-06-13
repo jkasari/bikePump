@@ -28,11 +28,12 @@ void AirGate::turnGateOff() {
 
 void AirGate::turnGateOn(float diff, float currentPSI) {
     float psiDiff = oldPSI > currentPSI ? oldPSI - currentPSI : currentPSI - oldPSI; 
-    if (openDuration != 0) {
-        flowRate = (psiDiff * 1000) / openDuration;
-    } else {
-        flowRate = .1;
-    }
+    flowRate = .2;
+    //if (openDuration != 0) {
+    //    flowRate = (psiDiff * 1000) / openDuration;
+    //} else {
+    //    flowRate = .1;
+    //}
     uint32_t milliSeconds = uint32_t(diff*flowRate);
     if (milliSeconds < MIN_OPEN_TIME) {
         milliSeconds = MIN_OPEN_TIME; // If the number is to small set it to the minimum time.
