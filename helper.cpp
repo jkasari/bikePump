@@ -40,18 +40,18 @@ void AirGate::turnGateOn(float diff, float currentPSI) {
     }
     oldPSI = currentPSI;
     openDuration = milliSeconds;
-    Serial.print("open duration: ");
-    Serial.print(openDuration);
-    Serial.print("  PSI diff: ");
-    Serial.print(psiDiff);
-    Serial.print("  pressure diff: ");
-    Serial.print(diff);
-    Serial.print("  flow rate: ");
-    Serial.print(flowRate);
-    Serial.print("  Old PSI: ");
-    Serial.print(oldPSI);
-    Serial.print("  current PSI: ");
-    Serial.println(currentPSI);
+    //Serial.print("open duration: ");
+    //Serial.print(openDuration);
+    //Serial.print("  PSI diff: ");
+    //Serial.print(psiDiff);
+    //Serial.print("  pressure diff: ");
+    //Serial.print(diff);
+    //Serial.print("  flow rate: ");
+    //Serial.print(flowRate);
+    //Serial.print("  Old PSI: ");
+    //Serial.print(oldPSI);
+    //Serial.print("  current PSI: ");
+    //Serial.println(currentPSI);
     flipGate(true); // Open the gate. 
 }
 
@@ -184,10 +184,10 @@ bool MainController::checkGates() {
 
 void MainController::adjustGates(float targetPSI, float currentPSI, float diff) {
     if (targetPSI > currentPSI) {
-        Serial.print("gate 1: ");
+        //Serial.print("gate 1: ");
         Gate_1.turnGateOn(diff, currentPSI);
     } else {
-        Serial.print("gate 2: ");
+        //Serial.print("gate 2: ");
         Gate_2.turnGateOn(diff, currentPSI);
     }
 }
@@ -220,6 +220,7 @@ void MainController::touchTarget() {
     // Brute force baby!!!
     if (Button_1.hasBeenPressed()) {
         Target -= .5;
+        Serial.print("button1 Pressed");
     } else if (Button_2.hasBeenPressed()) {
         Target += .5;
     }
