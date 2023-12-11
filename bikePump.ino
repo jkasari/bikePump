@@ -19,19 +19,29 @@ void setup() {
 }
 
 void loop() {
+    //Serial.println("Line 22");
     float currentPSI = getPressure(); // Get the current pressure
+    //Serial.println("Line 24");
     if (Controller.isStable(currentPSI)) {
+    ///Serial.println("Line 26");
       lastStablePressure = currentPSI;
+    //Serial.println("Line 28");
     }
     if (lastStablePressure < LOW_LIMIT) { // If the gates are closed and the current psi is below the low limit, go into smart mode. 
+    //Serial.println("Line 31");
         Controller.manualMode(currentPSI);
+    //Serial.println("Line 33");
     } else { // Otherwise, go into manual mode. This happens when no tire is attached to the pump. 
         Controller.smartMode(currentPSI);
+    //Serial.println("Line 36");
     }
     if (millis() - timer > SCREEN_RATE) {
+    //Serial.println("Line 39");
         Controller.displayTargetAndCurrent(Controller.getTarget(), currentPSI);
+    //Serial.println("Line 41");
         timer = millis();
     }
+    //Serial.println("Line 44");
     //Serial.println("Target: "+String(Controller.getTarget()));
     Controller.checkGates();
     //Display.displayNumber(currentPSI);

@@ -130,14 +130,15 @@ bool MainController::gatesClosed() {
 }
 
 bool MainController::isStable(float pressure) {
-        bool stable = false;
-        recordPressure(pressure); // record the new pressure to the recorded pressures.
-        float ave = getAveragePressure(); // Get the average of the recorded pressures. 
-        float diff = ave > pressure ? ave - pressure : pressure - ave; // Get the diff between the new pressure and average pressures.
-        if (!diff) { diff = 0; } // For start up edge case when there is no ave pressure. 
-        if (gatesClosed() && diff < STABLE_TOLERANCE) {
-            stable = true; // If the gates are closed and the diff is within tolerance, set return value to true.
-        }
+    bool stable = false;
+    recordPressure(pressure); // record the new pressure to the recorded pressures.
+    float ave = getAveragePressure(); // Get the average of the recorded pressures. 
+    float diff = ave > pressure ? ave - pressure : pressure - ave; // Get the diff between the new pressure and average pressures.
+    if (!diff) { diff = 0; } // For start up edge case when there is no ave pressure. 
+    if (gatesClosed() && diff < STABLE_TOLERANCE) {
+        stable = true; // If the gates are closed and the diff is within tolerance, set return value to true.
+    }
+    Serial.println("checked gates");
     //Serial.print("Stable : "+String(stable));
     return stable;
 }
