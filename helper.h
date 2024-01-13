@@ -15,7 +15,6 @@
 #define STORED_PRESSURE_COUNT 15 // How many readings are stored to later have the average calculated.
 #define TOLERANCE 3 // Limit on how close the program tries to get to the target pressure
 #define MIN_OPEN_TIME 50 // Minimum time the gates can be open for 
-#define TOLERANCE 10 // What does this do? is it left over?
 
 #define LCD_RS 3
 #define LCD_E 5
