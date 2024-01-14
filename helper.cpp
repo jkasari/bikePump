@@ -9,13 +9,15 @@ AirGate::AirGate(uint8_t Pin) {
 }
 
 bool AirGate::checkGate() {
+    uint32_t val = 0;
     if (!closed) {
         // If the gate is open, check to see how long.
         if (millis() - timeOpenned > openDuration) {
-            turnGateOff(); // If its longer then the set time, close it. 
+            flipGate(false); // If its longer then the set time, close it. 
+            val = openDuration;
         }
     }
-    return closed; // Returns true if the gate is closed.
+    return val; // Returns true if the gate is closed.
 }
 
 void AirGate::turnGateOn() {
@@ -140,6 +142,7 @@ bool MainController::isStable(float pressure) {
     }
     Serial.println("checked gates");
     //Serial.print("Stable : "+String(stable));
+    checkGates(pressure);
     return stable;
 }
 
@@ -159,6 +162,7 @@ void MainController::smartMode(float pressure) {
             Gate_2.resetGate(pressure);
         }
     }
+    checkGates(pressure);
 }
 
 void MainController::manualMode(float pressure) {
@@ -178,9 +182,22 @@ void MainController::manualMode(float pressure) {
     }
 }
 
-bool MainController::checkGates() {
-    Gate_1.checkGate();
-    Gate_2.checkGate();
+bool MainController::checkGates(float currentPsi) {
+    uint32_t gate2OpenTime = Gate_2.checkGate();
+    uint32_t gate1OpenTime = Gate_1.checkGate();
+    float oldPsi = OldPressures[STORED_PRESSURE_COUNT - 1];
+    float diff = oldPsi < currentPsi ? currentPsi -  oldPsi : oldPsi - currentPsi;
+    if (gate2OpenTime > 0) {
+       gate2Bias = gate2OpenTime / diff; 
+    }
+    if (gate1OpenTime > 0) {
+        gate1Bias = gate1OpenTime / diff;
+    }
+    Serial.print("Gate 1 Bias :  ");
+    Serial.println(gate1Bias);
+    Serial.print("Gate 2 Bias :  ");
+    Serial.println(gate2Bias);
+    Serial.println("");
 }
 
 void MainController::adjustGates(float targetPSI, float currentPSI, float diff) {

@@ -14,8 +14,7 @@
 #define STABLE_TOLERANCE .001 // The limit for the differnce between the average of the stored readings an the current reading
 #define STORED_PRESSURE_COUNT 15 // How many readings are stored to later have the average calculated.
 #define TOLERANCE 3 // Limit on how close the program tries to get to the target pressure
-#define MIN_OPEN_TIME 50 // Minimum time the gates can be open for 
-#define TOLERANCE 10 // What does this do? is it left over?
+#define MIN_OPEN_TIME 50 // Minimum time the gates can be open for.
 
 #define LCD_RS 3
 #define LCD_E 5
@@ -112,7 +111,7 @@ class MainController {
 
         // Keeps track of how long gates have been open for and closes them if needed. Returns true if they are both closed.
         // Needs to be called each time around the loop for the gates to work!
-        bool checkGates();
+        bool checkGates(float);
 
         // Returns true if both the gates are closed.
         bool gatesClosed();
@@ -150,9 +149,9 @@ class MainController {
         float OldPressures[STORED_PRESSURE_COUNT]; // Storage of pressure readings to take an average of. 
         bool Manual = true;
         float Target = 0.0;
-        float PressureWhenOpenned = 0.0;
-        float Gate1PSISecond = 0.0; // Amount of pressure that flows in a second
-        float Gate2PSISecond = 0.0;
+        float gate2Bias = 1.0;
+        float gate1Bias = 1.0;
+        float lastOpenDuration = 0;
 
         void adjustGates(float, float, float);
 
