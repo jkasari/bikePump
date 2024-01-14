@@ -1,6 +1,7 @@
 {
-    "port": "/dev/ttyUSB0",
+    "port": "/dev/ttyUSB1",
     "board": "arduino:avr:nano",
     "sketch": "bikePump.ino",
-    "programmer": "arduinoasispatmega32u4"
+    "programmer": "arduinoasispatmega32u4",
+    "configuration": "cpu=atmega328old"
 }

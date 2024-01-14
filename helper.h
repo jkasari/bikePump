@@ -47,16 +47,21 @@ class AirGate {
         void turnGateOff();
 
         // Takes in the number of seconds you want the gate to be turned on for. 
-        void turnGateOn(uint32_t);
+        void turnGateOn(float, float);
 
         // Returns true if the gate is closed. 
         bool isClosed();
+
+        // reset the oldPSI and openDuration data members. 
+        void resetGate(float);
 
     private:
         uint8_t Pin; // What arduino pin controls the gate
         bool closed = true;
         uint32_t openDuration = 0; // the set time for a gate to be openned
         uint32_t timeOpenned = 0; // Measure how long a gate has been open for
+        float flowRate = 0.0; // The rate at which air moves through the gate.
+        float oldPSI = 0.0; // Keeps a record of what pressure the gate was at. 
         // turn the gate on or off directly. 
         void flipGate(bool);
 
@@ -78,7 +83,7 @@ class Button {
   uint32_t hasBeenPressed();
 
   // Returns true when the button is pressed and false when released.
-  bool isPressed();
+  bool currentlyPressed();
 
   private:
   uint32_t TimePressed; // keep track of how long the button has been pressed
@@ -136,6 +141,8 @@ class MainController {
         Button Button_6;    
         AirGate Gate_1;
         AirGate Gate_2;
+        float flowRateIn;
+        float flowRateOut;
         float oldTargetPSI;
         float oldCurrentPSI;
         uint32_t settleTimer = 0; // Once the gates are closed this starts counting how long before we can check the pressure. 
@@ -146,7 +153,7 @@ class MainController {
         float gate1Bias = 1.0;
         float lastOpenDuration = 0;
 
-        void adjustGates(float, float);
+        void adjustGates(float, float, float);
 
         void calcAndOpenGate(bool, float);
 

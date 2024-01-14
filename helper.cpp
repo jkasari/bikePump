@@ -28,11 +28,32 @@ void AirGate::turnGateOff() {
     flipGate(false);
 }
 
-void AirGate::turnGateOn(uint32_t milliSeconds) {
+void AirGate::turnGateOn(float diff, float currentPSI) {
+    float psiDiff = oldPSI > currentPSI ? oldPSI - currentPSI : currentPSI - oldPSI; 
+    flowRate = .2;
+    //if (openDuration != 0) {
+    //    flowRate = (psiDiff * 1000) / openDuration;
+    //} else {
+    //    flowRate = .1;
+    //}
+    uint32_t milliSeconds = uint32_t(diff*flowRate);
     if (milliSeconds < MIN_OPEN_TIME) {
         milliSeconds = MIN_OPEN_TIME; // If the number is to small set it to the minimum time.
     }
+    oldPSI = currentPSI;
     openDuration = milliSeconds;
+    //Serial.print("open duration: ");
+    //Serial.print(openDuration);
+    //Serial.print("  PSI diff: ");
+    //Serial.print(psiDiff);
+    //Serial.print("  pressure diff: ");
+    //Serial.print(diff);
+    //Serial.print("  flow rate: ");
+    //Serial.print(flowRate);
+    //Serial.print("  Old PSI: ");
+    //Serial.print(oldPSI);
+    //Serial.print("  current PSI: ");
+    //Serial.println(currentPSI);
     flipGate(true); // Open the gate. 
 }
 
@@ -42,6 +63,11 @@ void AirGate::flipGate(bool highOrLow) {
         timeOpenned = millis(); // record the exact time the gate was openned. 
     }
     digitalWrite(Pin, int(highOrLow)); // set the gate pin to on or off. 
+}
+
+void AirGate::resetGate(float currentPSI) {
+    oldPSI = currentPSI;
+    openDuration = 0;
 }
 
 bool AirGate::isClosed() {
@@ -55,17 +81,17 @@ Button::Button(uint8_t Pin) {
 
 uint32_t Button::hasBeenPressed() {
     uint32_t value = 0;
-    if (isPressed()) {
+    if (currentlyPressed()) {
         TimePressed++; // If currently pressed, increment the time pressed. 
     }
-    if (!isPressed() && TimePressed > 0) {
+    if (!currentlyPressed() && TimePressed > 0) {
         value = TimePressed; // If the button is not pressed but has a record of being pressed, reset the time pressed and return how long it was pressed for. 
         TimePressed = 0;
     }
     return value;
 }
 
-bool Button::isPressed() {
+bool Button::currentlyPressed() {
     return digitalRead(Pin) == LOW; // Return if the pin has been pulled up. 
 }
 
@@ -106,14 +132,15 @@ bool MainController::gatesClosed() {
 }
 
 bool MainController::isStable(float pressure) {
-        bool stable = false;
-        recordPressure(pressure); // record the new pressure to the recorded pressures.
-        float ave = getAveragePressure(); // Get the average of the recorded pressures. 
-        float diff = ave > pressure ? ave - pressure : pressure - ave; // Get the diff between the new pressure and average pressures.
-        if (!diff) { diff = 0; } // For start up edge case when there is no ave pressure. 
-        if (gatesClosed() && diff < STABLE_TOLERANCE) {
-            stable = true; // If the gates are closed and the diff is within tolerance, set return value to true.
-        }
+    bool stable = false;
+    recordPressure(pressure); // record the new pressure to the recorded pressures.
+    float ave = getAveragePressure(); // Get the average of the recorded pressures. 
+    float diff = ave > pressure ? ave - pressure : pressure - ave; // Get the diff between the new pressure and average pressures.
+    if (!diff) { diff = 0; } // For start up edge case when there is no ave pressure. 
+    if (gatesClosed() && diff < STABLE_TOLERANCE) {
+        stable = true; // If the gates are closed and the diff is within tolerance, set return value to true.
+    }
+    Serial.println("checked gates");
     //Serial.print("Stable : "+String(stable));
     checkGates(pressure);
     return stable;
@@ -125,30 +152,33 @@ void MainController::smartMode(float pressure) {
     if (isStable(pressure)) { // Only continue if we have a stable pressure.
         if (!Manual) { // If we were not just in manual mode. 
             float diff = pressure > Target ? pressure - Target : Target - pressure;
-            if (diff > TOLERANCE) {
-              Serial.println("gates should adjust");
-            }
             if (Target > pressure || diff > .3) {
-                adjustGates(Target, pressure);
+                adjustGates(Target, pressure, diff);
             } 
         } else { // If we just came out of manual mode, set the target to the current pressure. This happens when you first connect a tire to the pump. 
             Manual = false;
             Target = round(pressure); // Round to the nearest non float number. 
+            Gate_1.resetGate(pressure);
+            Gate_2.resetGate(pressure);
         }
     }
     checkGates(pressure);
 }
 
 void MainController::manualMode(float pressure) {
-    if (isStable(pressure)) { // check to make sure the pressure is stable before continuing
+    //if (isStable(pressure)) { // check to make sure the pressure is stable before continuing
         Manual = true; // Record that we are in manual mode.
         Target = pressure; // Set the target to whatever the current pressure is.
+    //}
+    if (Button_2.currentlyPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
+        Gate_1.turnGateOn();
+    } else {
+        Gate_1.turnGateOff();
     }
-    uint8_t waitTime = 200; // keep the gate open for long enough to go around the loop and few times. 
-    if (Button_2.isPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
-        Gate_1.turnGateOn(waitTime);
-    } else if (Button_1.isPressed()) {
-        Gate_2.turnGateOn(waitTime);
+    if (Button_1.currentlyPressed()) { // The gates being different numbers from the buttons is not a bug, I just have the buttons swapped on the pcb. 
+        Gate_2.turnGateOn();
+    } else {
+        Gate_2.turnGateOff();
     }
 }
 
@@ -170,34 +200,45 @@ bool MainController::checkGates(float currentPsi) {
     Serial.println("");
 }
 
-void MainController::adjustGates(float target, float current) {
-    float diff = target - current; 
-    //Serial.println("  target - current = diff : "+String(target)+" - "+String(current)+" = "+String(diff));
-    if (diff > 0) { // calcAndOpenGate needs a positive number, so we mulitple negative differences by -1. 
-        calcAndOpenGate(true, diff);
+void MainController::adjustGates(float targetPSI, float currentPSI, float diff) {
+    if (targetPSI > currentPSI) {
+        //Serial.print("gate 1: ");
+        Gate_1.turnGateOn(diff, currentPSI);
     } else {
-        calcAndOpenGate(false, diff * -1);
+        //Serial.print("gate 2: ");
+        Gate_2.turnGateOn(diff, currentPSI);
     }
 }
+
+//void MainController::adjustGates(float target, float current) {
+//    float diff = target - current; 
+//    //Serial.println("  target - current = diff : "+String(target)+" - "+String(current)+" = "+String(diff));
+//    if (diff > 0) { // calcAndOpenGate needs a positive number, so we mulitple negative differences by -1. 
+//        calcAndOpenGate(true, diff);
+//    } else {
+//        calcAndOpenGate(false, diff * -1);
+//    }
+//}
 
 
 //CHANGED HERE
-void MainController::calcAndOpenGate(bool gateNum, float diff) {
-    //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
-    float waitTime = diff * 50; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
-    waitTime = uint32_t(round(waitTime));
-    // Must be in milli seconds
-    if (gateNum) {// choose which gate to open. 
-        Gate_1.turnGateOn( waitTime);
-    } else {
-        Gate_2.turnGateOn(waitTime);
-    }
-}
+//void MainController::calcAndOpenGate(bool gateOneorTwo, float diff) {
+//    //uint32_t waitTime = diff * (-2000/(diff+1)+2000);
+//    float waitTime = diff * 50; // Take the difference and multiple it by 200 to give us the milliseconds to be open for.  
+//    waitTime = uint32_t(round(waitTime));
+//    // Must be in milli seconds
+//    if (gateOneorTwo) {// choose which gate to open. 
+//        Gate_1.turnGateOn( waitTime);
+//    } else {
+//        Gate_2.turnGateOn(waitTime);
+//    }
+//}
 
 void MainController::touchTarget() {
     // Brute force baby!!!
     if (Button_1.hasBeenPressed()) {
         Target -= .5;
+        Serial.print("button1 Pressed");
     } else if (Button_2.hasBeenPressed()) {
         Target += .5;
     }
